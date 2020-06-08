@@ -105,3 +105,6 @@ STATIC_URL = '/static/'
 
 # MISC
 ADMIN_SITE_PATH = "admin/"
+
+# Custom User Model
+AUTH_USER_MODEL = "users.User"
