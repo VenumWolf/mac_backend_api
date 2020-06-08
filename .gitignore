@@ -279,3 +279,6 @@ bit_access_website/media/
 .pytest_cache/
 
 
+### Development DB
+
+*.sqlite3
