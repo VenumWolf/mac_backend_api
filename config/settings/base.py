@@ -8,15 +8,23 @@ SECRET_KEY = "ugu!ng_waw7zmm0rbkxz&2m3-*zc+%@qy#ir_1@-ww-z@#10)6"
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework'
+    
 ]
+
+THIRD_PARTY_APPS = [
+    'rest_framework',
+]
+
+LOCAL_APPS = []
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
