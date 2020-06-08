@@ -53,7 +53,6 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
-                "authentication_service.utils.context_processors.settings_context",
             ],
         },
     }
@@ -93,19 +92,6 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-
-# Rest framework settings
-
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated'
-    ),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-    ),
-}
 
 # MISC
 ADMIN_SITE_PATH = "admin/"
