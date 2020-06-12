@@ -22,7 +22,9 @@ THIRD_PARTY_APPS = [
     'rest_framework',
 ]
 
-LOCAL_APPS = []
+LOCAL_APPS = [
+    'mac_backend_api.users'
+]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -103,3 +105,6 @@ STATIC_URL = '/static/'
 
 # MISC
 ADMIN_SITE_PATH = "admin/"
+
+# Custom User Model
+AUTH_USER_MODEL = "users.User"
