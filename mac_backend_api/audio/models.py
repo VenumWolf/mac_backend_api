@@ -1,7 +1,18 @@
 from uuid import uuid4
 
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
+
+User = get_user_model()
+
+
+class Author(models.Model):
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        help_text="A reference to the User instance"
+    )
 
 
 class Audio(models.Model):
@@ -29,6 +40,10 @@ class Audio(models.Model):
         max_length=2000,
         blank=True,
         help_text="A short description for the audio"
+    )
+    authors = models.ManyToManyField(
+        to=Author,
+        help_text="References to the authors audios"
     )
     listen_count = models.IntegerField(
         default=0,
