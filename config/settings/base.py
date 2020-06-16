@@ -20,11 +20,12 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     'rest_framework',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
 ]
 
 LOCAL_APPS = [
-    'mac_backend_api.users'
+    'mac_backend_api.users',
+    'mac_backend_api.audios',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
