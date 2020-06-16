@@ -25,7 +25,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     'mac_backend_api.users',
-    'mac_backend_api.audios',
+    'mac_backend_api.audio',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
