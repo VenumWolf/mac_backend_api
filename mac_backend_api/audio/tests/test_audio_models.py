@@ -20,6 +20,3 @@ class TestAudioModel(TestCase):
 
     def test_get_url(self) -> None:
         assert self.audio.get_absolute_url() == f"/api/audio/{self.audio.id}/"
-
-    def test_get_authors(self) -> None:
-        assert set(self.audio.get_authors()) == {self.audio_author_1, self.audio_author_2}
