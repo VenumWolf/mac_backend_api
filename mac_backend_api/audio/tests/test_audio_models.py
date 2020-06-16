@@ -13,6 +13,11 @@ User = get_user_model()
 class TestAudioModel(TestCase):
     def setUp(self) -> None:
         self.audio = mixer.blend(Audio)
+        self.audio.views = 0
 
     def test_get_url(self) -> None:
         assert self.audio.get_absolute_url() == f"/api/audio/{self.audio.id}/"
+
+    def test_add_view(self) -> None:
+        self.audio.add_view()
+        assert self.audio.views == 1
