@@ -62,9 +62,9 @@ class Audio(models.Model):
                   "it can only be viewed by those with its link"
     )
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         return reverse("api:audio-detail", kwargs={"id": self.id})
 
-    def add_listen(self):
+    def add_listen(self) -> None:
         self.listen_count += 1
         self.save()
