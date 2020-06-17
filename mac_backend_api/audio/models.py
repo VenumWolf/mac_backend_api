@@ -64,3 +64,7 @@ class Audio(models.Model):
 
     def get_absolute_url(self):
         return reverse("api:audio-detail", kwargs={"id": self.id})
+
+    def add_listen(self):
+        self.listen_count += 1
+        self.save()
