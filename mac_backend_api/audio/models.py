@@ -2,6 +2,7 @@ from uuid import uuid4
 
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 
 User = get_user_model()
@@ -60,3 +61,6 @@ class Audio(models.Model):
         help_text="Indicates if the audio should be shown on public indexes, "
                   "it can only be viewed by those with its link"
     )
+
+    def get_absolute_url(self):
+        return reverse("api:audio-detail", kwargs={"id": self.id})
