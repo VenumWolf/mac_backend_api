@@ -18,6 +18,6 @@ class TestAudioModel(TestCase):
     def test_get_url(self) -> None:
         assert self.audio.get_absolute_url() == f"/api/audio/{self.audio.id}/"
 
-    def test_add_view(self) -> None:
-        self.audio.add_view()
-        assert self.audio.views == 1
+    def test_add_listen(self) -> None:
+        self.audio.add_listen()
+        assert self.audio.listen_count == 1
