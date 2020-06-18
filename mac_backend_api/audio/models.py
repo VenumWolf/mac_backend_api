@@ -62,6 +62,10 @@ class Audio(models.Model):
                   "it can only be viewed by those with its link"
     )
 
+    @property
+    def like_count(self) -> int:
+        return Like.objects.filter(audio=self).count()
+
     def get_absolute_url(self) -> str:
         return reverse("api:audio-detail", kwargs={"id": self.id})
 
