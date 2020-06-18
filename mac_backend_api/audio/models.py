@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -97,6 +98,33 @@ class Audio(models.Model):
         """
         self.listen_count += 1
         self.save()
+
+    def add_like(self, user) -> None:
+        """
+        Add a like to the audio for a given user.
+
+        If the user has already liked the audio, this method will fail silently.
+
+        :param  user: The user liking the audio
+        """
+        try:
+            like = Like(user=user, audio=self)
+            like.save()
+        except UserAlreadyLikesException:
+            pass
+
+    def remove_like(self, user) -> None:
+        """
+        Remove a like from the audio for a given user.
+
+        If the user has not liked the audio already, this method will fail silently.
+
+        :param user: The user unliking the audio
+        """
+        try:
+            self.like_set.get(user=user, audio=self).delete()
+        except ObjectDoesNotExist:
+            pass
 
 
 class Like(models.Model):
