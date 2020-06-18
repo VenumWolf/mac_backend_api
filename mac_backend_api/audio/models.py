@@ -9,6 +9,9 @@ User = get_user_model()
 
 
 class Author(models.Model):
+    """
+    Provides a layer over the User model.  Audios may be accessed as a queryset through the `audio_set` parameter.
+    """
     user = models.ForeignKey(
         to=User,
         on_delete=models.CASCADE,
@@ -17,6 +20,11 @@ class Author(models.Model):
 
 
 class Audio(models.Model):
+    """
+    Provides information storage for an uploaded audio.  The file information is stored on `Stream` objects.
+    Audio streams can be accessed as a queryset through the `stream_set` parameter.
+    """
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid4,
@@ -64,17 +72,37 @@ class Audio(models.Model):
 
     @property
     def like_count(self) -> int:
+        """
+        A property referring to the number of people who have liked the audio.
+
+        `like_count` is calculated on-the-fly based on the number of Like objects with audio=self.
+
+        :return: The number of people who have liked the audio
+        """
         return Like.objects.filter(audio=self).count()
 
     def get_absolute_url(self) -> str:
+        """
+        Resolves a working URL for accessing the Audio over HTTP
+
+        :return: The URL path to the Audio
+        """
         return reverse("api:audio-detail", kwargs={"id": self.id})
 
     def add_listen(self) -> None:
+        """
+        A convenience method which adds 1 to the `listen_count`.
+        """
         self.listen_count += 1
         self.save()
 
 
 class Like(models.Model):
+    """
+    Represents a like (or up-vote.)
+
+    Unlike views, likes must be from a registered user, and each user is allowed to create 1 like per audio.
+    """
     user = models.ForeignKey(
         to=User,
         on_delete=models.CASCADE,
