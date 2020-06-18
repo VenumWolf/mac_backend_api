@@ -68,3 +68,16 @@ class Audio(models.Model):
     def add_listen(self) -> None:
         self.listen_count += 1
         self.save()
+
+
+class Like(models.Model):
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        help_text="A reference to the User instance"
+    )
+    audio = models.ForeignKey(
+        to=Audio,
+        on_delete=models.CASCADE,
+        help_text="A reference to the Audio instance"
+    )
