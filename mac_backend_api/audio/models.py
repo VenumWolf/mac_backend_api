@@ -5,6 +5,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 
+from mac_backend_api.audio.exceptions import UserAlreadyLikesException
+
 User = get_user_model()
 
 
@@ -113,3 +115,15 @@ class Like(models.Model):
         on_delete=models.CASCADE,
         help_text="A reference to the Audio instance"
     )
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None) -> None:
+        if self.__is_new_like(self):
+            super().save(force_insert, force_update, using, update_fields)
+        else:
+            raise UserAlreadyLikesException()
+
+    @classmethod
+    def __is_new_like(cls, like) -> bool:
+        return len(cls.objects.filter(user=like.user, audio=like.audio)) == 0
+
+
