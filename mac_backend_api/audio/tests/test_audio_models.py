@@ -36,3 +36,7 @@ class TestAudioModel(TestCase):
         like.save()
         assert self.audio.like_count == 1
         like.delete()
+
+    def test_like_count_with_other_likes_present(self):
+        mixer.blend(Like)
+        assert self.audio.like_count == 0
