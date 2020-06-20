@@ -38,6 +38,34 @@ class TestAudioModel(TestCase):
         mixer.blend(Like)
         assert self.audio.like_count == 0
 
+    def test_add_like(self):
+        """Ensures likes are added correctly"""
+        user = mixer.blend(User)
+        self.audio.add_like(user)
+        assert self.audio.like_set.get(user=user).user == user
+
+    def test_add_double_like(self):
+        """Ensures subsequent attempts to like don't raise exceptions"""
+        user = mixer.blend(User)
+        self.audio.add_like(user)
+        self.audio.add_like(user)
+        assert self.audio.like_set.get(user=user).user == user
+
+    def test_remove_like(self):
+        """Ensures likes are removed correctly"""
+        user = mixer.blend(User)
+        self.audio.add_like(user)
+        self.audio.remove_like(user)
+        assert len(self.audio.like_set.filter(user=user)) == 0
+
+    def test_remove_nonexistent_like(self):
+        """Ensures subsequent attempts to unlike don't raise exceptions"""
+        user = mixer.blend(User)
+        self.audio.add_like(user)
+        self.audio.remove_like(user)
+        self.audio.remove_like(user)
+        assert len(self.audio.like_set.filter(user=user)) == 0
+
     def __blend_audio_and_author(self) -> None:
         self.audio = mixer.blend(Audio)
         self.author = mixer.blend(Author)
