@@ -14,5 +14,5 @@ class TestUrls:
 
     def test_audio_list(self):
         assert reverse("audio:audio-list") == "/api/audio/"
-        assert resolve("/api/audio/list/").view_name == "audio:audio-list"
+        assert resolve("/api/audio/").view_name == "audio:audio-list"
 
