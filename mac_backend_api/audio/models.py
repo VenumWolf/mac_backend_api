@@ -3,7 +3,7 @@ from uuid import uuid4
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.urls import reverse
+from django.urls import reverse_lazy
 from django.utils import timezone
 
 from mac_backend_api.audio.exceptions import UserAlreadyLikesException
@@ -90,7 +90,7 @@ class Audio(models.Model):
 
         :return: The URL path to the Audio
         """
-        return reverse("api:audio-detail", kwargs={"id": self.id})
+        return reverse_lazy("audio:audio-detail", kwargs={"id": self.id})
 
     def add_listen(self) -> None:
         """
