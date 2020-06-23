@@ -282,3 +282,8 @@ bit_access_website/media/
 ### Development DB
 
 *.sqlite3
+
+
+### Media Storage
+
+development_media_storage/
