@@ -2,7 +2,8 @@ import string
 from random import SystemRandom
 
 DEFAULT_ID_LENGTH = 14
-DEFAULT_CHARACTER_SET = string.ascii_letters + string.digits
+SAFE_SPECIALS = "-._~"
+DEFAULT_CHARACTER_SET = string.ascii_letters + string.digits + SAFE_SPECIALS
 
 
 def random_id(length=DEFAULT_ID_LENGTH, character_set=DEFAULT_CHARACTER_SET):
