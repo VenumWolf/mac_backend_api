@@ -4,7 +4,7 @@ from django.test import TestCase
 from mixer.backend.django import mixer
 
 from mac_backend_api.audio.exceptions import UserAlreadyLikesException
-from mac_backend_api.audio.models import Audio, Author, Like
+from mac_backend_api.audio.models import Audio, AudioStream, Author, Like, get_audio_stream_upload_path
 
 User = get_user_model()
 
@@ -73,6 +73,17 @@ class TestAudioModel(TestCase):
         self.audio.authors.add(self.author)
         self.audio.views = 0
         self.audio.save()
+
+
+@pytest.mark.django_db
+class TestAudioStreamModel(TestCase):
+    def setUp(self) -> None:
+        self.audio = mixer.blend(Audio)
+        self.audio_stream = mixer.blend(AudioStream, audio=self.audio)
+
+    def test_get_audio_stream_upload_path(self):
+        assert (get_audio_stream_upload_path(self.audio_stream)
+                == f"audios/{self.audio_stream.audio.id}/{self.audio_stream.id}.{self.audio_stream.format}")
 
 
 @pytest.mark.django_db
