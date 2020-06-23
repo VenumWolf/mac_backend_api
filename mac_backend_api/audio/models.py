@@ -134,7 +134,7 @@ def get_audio_stream_upload_path(stream, filename) -> str:
     :param filename: The name of the file (this value is ignored, but is necessary to be used as the upload_to value)
     :return:         The path for the file upload
     """
-    return ""
+    return f"audio/{stream.audio.id}/{stream.id}.{stream.format}"
 
 
 class AudioStream(models.Model):
