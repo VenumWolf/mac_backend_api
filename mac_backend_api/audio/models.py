@@ -139,10 +139,10 @@ def get_audio_stream_upload_path(stream, filename) -> str:
 
 class AudioStream(models.Model):
     class AudioFormat(models.TextChoices):
-        MP3 = '1', "mp3"
-        AAC = '2', "aac"
-        OGG = '3', "ogg"
-        WAV = '5', "wav"
+        MP3 = "mp3"
+        AAC = "aac"
+        OGG = "ogg"
+        WAV = "wav"
 
     id = models.UUIDField(
         primary_key=True,
