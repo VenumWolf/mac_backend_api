@@ -1,4 +1,5 @@
 import os
+from os import path
 
 from .base import *
 
@@ -23,3 +24,7 @@ DATABASES = {
 
 EMAIL_HOST = "localhost"
 EMAIL_PORT = 1025
+
+# MEDIA
+MEDIA_ROOT = path.join(ROOT_DIR, "development_media_storage")
+MEDIA_URL = "/media/"
