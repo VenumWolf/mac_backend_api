@@ -140,6 +140,7 @@ class AudioStream(models.Model):
 
     id = models.UUIDField(
         primary_key=True,
+        default=uuid4,
         editable=False,
         help_text="The unique ID of the stream"
     )
