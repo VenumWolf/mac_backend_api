@@ -83,7 +83,7 @@ class TestAudioStreamModel(TestCase):
 
     def test_get_audio_stream_upload_path(self):
         assert (get_audio_stream_upload_path(self.audio_stream, "fake-file-name")
-                == f"audios/{self.audio_stream.audio.id}/{self.audio_stream.id}.{self.audio_stream.format}")
+                == f"audio/{self.audio_stream.audio.id}/{self.audio_stream.id}.{self.audio_stream.format}")
 
 
 @pytest.mark.django_db
