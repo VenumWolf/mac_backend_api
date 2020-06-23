@@ -127,7 +127,13 @@ class Audio(models.Model):
             pass
 
 
-def get_audio_stream_upload_path(stream) -> str:
+def get_audio_stream_upload_path(stream, filename) -> str:
+    """
+    Generates the file path to which an audio stream's file will be stored.
+    :param stream:   The audio stream instance
+    :param filename: The name of the file (this value is ignored, but is necessary to be used as the upload_to value)
+    :return:         The path for the file upload
+    """
     return ""
 
 
