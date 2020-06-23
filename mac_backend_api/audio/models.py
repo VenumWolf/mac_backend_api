@@ -127,6 +127,41 @@ class Audio(models.Model):
             pass
 
 
+def get_audio_stream_upload_path(stream) -> str:
+    return ""
+
+
+class AudioStream(models.Model):
+    class AudioFormat(models.TextChoices):
+        MP3 = '1', "mp3"
+        AAC = '2', "aac"
+        OGG = '3', "ogg"
+        WAV = '5', "wav"
+
+    id = models.UUIDField(
+        primary_key=True,
+        editable=False,
+        help_text="The unique ID of the stream"
+    )
+    audio = models.ForeignKey(
+        to=Audio,
+        on_delete=models.CASCADE,
+        help_text="A reference to the Audio instance"
+    )
+    format = models.CharField(
+        max_length=10,
+        choices=AudioFormat.choices,
+        help_text="The format of the audio stream"
+    )
+    bit_rate = models.IntegerField(
+        help_text="The stream's bit-rate in hz"
+    )
+    file = models.FileField(
+        upload_to=get_audio_stream_upload_path,
+        help_text="The stream's audio file, it will be processed to match the format and bit_rate values"
+    )
+
+
 class Like(models.Model):
     """
     Represents a like (or up-vote.)
