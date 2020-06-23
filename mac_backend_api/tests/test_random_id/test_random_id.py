@@ -1,4 +1,3 @@
-import string
 from unittest import TestCase
 
 from mac_backend_api.utils.random_ids.random_id import random_id
