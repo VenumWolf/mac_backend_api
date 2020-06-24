@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from mac_backend_api.utils.random_ids.random_id import random_id
+from mac_backend_api.utils.random_id.random_id import random_id
 
 
 class TestRandomIdGenerator(TestCase):
