@@ -14,17 +14,3 @@ class AudioViewSet(ModelViewSet):
         if self.action == "list":
             queryset = queryset.filter(is_public=True)
         return queryset
-
-
-class BaseAudioViewSet(GenericViewSet):
-    serializer_class = AudioSerializer
-    lookup_field = "pk"
-
-
-class AudioListViewSet(BaseAudioViewSet, ):
-    queryset = Audio.objects.filter(is_public=True)
-
-
-class AudioDetailViewSet(BaseAudioViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
-                         mixins.DestroyModelMixin):
-    queryset = Audio.objects.all()
