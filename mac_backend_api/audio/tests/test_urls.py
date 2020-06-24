@@ -9,10 +9,10 @@ from mac_backend_api.audio.models import Audio
 class TestUrls:
     def test_audio_detail(self):
         audio = mixer.blend(Audio)
-        assert reverse("audio:audio-detail", kwargs={"id": audio.id}) == f"/api/audio/{audio.id}"
-        assert resolve(f"/api/audio/{audio.id}").view_name == "audio:audio-detail"
+        assert reverse("api:audio-detail", kwargs={"pk": audio.id}) == f"/api/audio/{audio.id}"
+        assert resolve(f"/api/audio/{audio.id}").view_name == "api:audio-detail"
 
     def test_audio_list(self):
-        assert reverse("audio:audio-list") == "/api/audio/"
-        assert resolve("/api/audio/").view_name == "audio:audio-list"
+        assert reverse("api:audio-list") == "/api/audio/"
+        assert resolve("/api/audio/").view_name == "api:audio-list"
 
