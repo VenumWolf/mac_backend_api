@@ -17,7 +17,7 @@ class TestAudioModel(TestCase):
 
     def test_get_url(self) -> None:
         """Ensures the audio url is what is expected"""
-        assert self.audio.get_absolute_url() == f"/api/audio/{self.audio.id}"
+        assert self.audio.get_absolute_url() == f"/api/audio/{self.audio.id}/"
 
     def test_add_listen(self) -> None:
         """Ensures the Audio's add_listen method adds 1 listen"""
