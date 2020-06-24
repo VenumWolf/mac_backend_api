@@ -10,7 +10,7 @@ class TestUrls:
     def test_audio_detail(self):
         audio = mixer.blend(Audio)
         assert reverse("api:audio-detail", kwargs={"pk": audio.id}) == f"/api/audio/{audio.id}/"
-        assert resolve(f"/api/audio/{audio.id}").view_name == "api:audio-detail"
+        assert resolve(f"/api/audio/{audio.id}/").view_name == "api:audio-detail"
 
     def test_audio_list(self):
         assert reverse("api:audio-list") == "/api/audio/"
