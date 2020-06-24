@@ -90,7 +90,7 @@ class Audio(models.Model):
 
         :return: The URL path to the Audio
         """
-        return reverse_lazy("audio:audio-detail", kwargs={"id": self.id})
+        return reverse_lazy("api:audio-detail", kwargs={"pk": self.id})
 
     def add_listen(self) -> None:
         """

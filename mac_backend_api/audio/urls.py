@@ -1,10 +1,11 @@
-from django.urls import path
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
 
-from mac_backend_api.audio.api.views import AudioListView, AudioDetailView
+from mac_backend_api.audio.api.views import AudioViewSet
 
-app_name = 'audio'
+router = DefaultRouter()
+router.register("", AudioViewSet, basename="audio")
 
 urlpatterns = [
-    path("<uuid:id>", AudioDetailView.as_view(), name="audio-detail"),
-    path("", AudioListView.as_view(), name="audio-list")
+    path("", include(router.urls))
 ]
