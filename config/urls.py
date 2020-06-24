@@ -16,7 +16,6 @@ urlpatterns = [
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path("api/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/audio/", include("mac_backend_api.audio.urls")),
     path("api/", include("config.api_router")),
     path("", RedirectView.as_view(url="/api/"), name="index")
 ]
