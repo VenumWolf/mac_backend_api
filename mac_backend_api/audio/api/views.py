@@ -7,7 +7,7 @@ from mac_backend_api.audio.models import Audio
 
 class AudioViewSet(ModelViewSet):
     serializer_class = AudioSerializer
-    lookup_field = "pk"
+    lookup_field = "id"
     queryset = Audio.objects.all()
 
     def filter_queryset(self, queryset):
