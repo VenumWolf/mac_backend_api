@@ -90,10 +90,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S.%f%z"
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
+    ],
+    'DATETIME_FORMAT': DATETIME_FORMAT
 }
 
 # Internationalization
