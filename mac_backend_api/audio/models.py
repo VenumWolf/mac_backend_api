@@ -180,6 +180,10 @@ class AudioStream(models.Model):
     bit_rate = models.IntegerField(
         help_text="The stream's bit-rate in hz"
     )
+    allow_downloads = models.BooleanField(
+        default=False,
+        help_text="Indicates if file should offer a direct download link.",
+    )
     file = models.FileField(
         upload_to=get_audio_stream_upload_path,
         help_text="The stream's audio file, it will be processed to match the format and bit_rate values"
