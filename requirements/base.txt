@@ -11,3 +11,7 @@ python-decouple==3.3
 
 # Staticfiles
 whitenoise==5.1.0
+
+# Audio System
+pydub==0.24.1
+
