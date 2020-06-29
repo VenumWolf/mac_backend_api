@@ -16,21 +16,21 @@ Running type checks with mypy:
 
   $ mypy mac_backend_api
 
-Test coverage
+Running Tests
 ^^^^^^^^^^^^^
 
-To run the tests, check your test coverage, and generate an HTML coverage report::
-
-    $ coverage run -m pytest
-    $ coverage html
-    $ open htmlcov/index.html
-
-Running tests with py.test
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+To run the tests:
 
 ::
 
   $ pytest
+
+Generating Coverage Reports
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To run the tests, check your test coverage, and generate an HTML coverage report::
+
+    $ pytest --cov-report html --cov=mac_backend_api
 
 Email Server
 ^^^^^^^^^^^^
