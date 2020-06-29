@@ -1,7 +1,9 @@
+from django.conf import settings
 from django.contrib import admin
 from django.urls import path
-from django.urls.conf import include
+from django.urls.conf import include, re_path
 from django.views.generic import RedirectView
+from django.views.static import serve
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -17,3 +19,11 @@ urlpatterns = [
     path("api/", include("config.api_router")),
     path("", RedirectView.as_view(url="/api/"), name="index")
 ]
+
+
+if settings.DEBUG:
+    urlpatterns += [
+        re_path(r'^media/(?P<path>.*)$', serve, {
+            'document_root': settings.MEDIA_ROOT,
+        }),
+    ]

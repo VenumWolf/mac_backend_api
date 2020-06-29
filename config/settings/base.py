@@ -20,11 +20,12 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     'rest_framework',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
 ]
 
 LOCAL_APPS = [
-    'mac_backend_api.users'
+    'mac_backend_api.users',
+    'mac_backend_api.audio',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -89,10 +90,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S.%f%z"
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
+    ],
+    'DATETIME_FORMAT': DATETIME_FORMAT
 }
 
 # Internationalization
