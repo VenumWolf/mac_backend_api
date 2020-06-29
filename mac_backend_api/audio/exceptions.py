@@ -15,8 +15,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
-from django.conf import settings
+class UserAlreadyLikesException(Exception):
+    """Raised when adding a like to an audio the user has already liked"""
 
-
-def settings_context(_request):
-    return {"settings": settings}
+    def __init__(self):
+        super(Exception, self).__init__("User already likes the audio")

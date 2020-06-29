@@ -15,8 +15,16 @@
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
-from django.conf import settings
+from rest_framework import serializers
+
+from mac_backend_api.users.models import User
 
 
-def settings_context(_request):
-    return {"settings": settings}
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["username", "name", "is_staff", "is_active", "url"]
+
+        extra_kwargs = {
+            "url": {"view_name": "api:user-detail", "lookup_field": "username"}
+        }

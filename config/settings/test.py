@@ -15,8 +15,33 @@
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
-from django.conf import settings
+from .development import *
 
+# GENERAL
 
-def settings_context(_request):
-    return {"settings": settings}
+SECRET_KEY = '*piusv42ywk&=dy$xc$qmk$vch17zo2-kzxi0+d4o($yvy4wv-'
+
+TEST_RUNNER = "django.test.runner.DiscoverRunner"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "",
+    }
+}
+
+PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
+TEMPLATES[-1]["OPTIONS"]["loaders"] = [
+    (
+        "django.template.loaders.cached.Loader",
+        [
+            "django.template.loaders.filesystem.Loader",
+            "django.template.loaders.app_directories.Loader",
+        ],
+    )
+]
+
+# EMAIL
+
+EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"

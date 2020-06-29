@@ -15,8 +15,15 @@
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
-from django.conf import settings
+from django.urls import reverse
 
 
-def settings_context(_request):
-    return {"settings": settings}
+class TestAuthUrls:
+    def test_token_obtain_url(self):
+        assert reverse("token_obtain_pair") == "/api/auth/token/"
+
+    def test_token_refresh_url(self):
+        assert reverse("token_refresh") == "/api/auth/token/refresh/"
+
+    def test_token_verify_url(self):
+        assert reverse("token_verify") == "/api/auth/token/verify/"

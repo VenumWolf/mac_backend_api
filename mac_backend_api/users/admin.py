@@ -15,8 +15,19 @@
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
-from django.conf import settings
+from django.contrib import admin
+from django.contrib.auth import admin as auth_admin
+from django.contrib.auth import get_user_model
+
+from mac_backend_api.users.forms import UserChangeForm, UserCreationForm
+
+User = get_user_model()
 
 
-def settings_context(_request):
-    return {"settings": settings}
+@admin.register(User)
+class UserAdmin(auth_admin.UserAdmin):
+    form = UserChangeForm
+    add_form = UserCreationForm
+    fieldsets = (("User", {"fields": ("name",)}),) + auth_admin.UserAdmin.fieldsets
+    list_display = ["username", "name", "is_superuser"]
+    search_fields = ["name"]

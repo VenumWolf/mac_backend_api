@@ -15,8 +15,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
-from django.conf import settings
+from django.apps import AppConfig
 
 
-def settings_context(_request):
-    return {"settings": settings}
+class UsersConfig(AppConfig):
+    name = 'mac_backend_api.users'
