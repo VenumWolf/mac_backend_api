@@ -5,6 +5,26 @@ Mind Audio Central Backend API
 The Basics
 ----------
 
+Installation Instructions
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Development
+~~~~~~~~~~~
+
+#. Install the project requirements: ::
+
+    $ pip install -r requirements/development.txt
+
+#. Run the database migration: ::
+
+    $ python manage.py migrate
+
+#. Run the development server: ::
+
+    $ python manage.py runserver
+
+You should now have a development server at: <http://127.0.0.1:8000/>
+
 Type checks
 ^^^^^^^^^^^
 
