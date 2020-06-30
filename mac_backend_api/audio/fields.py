@@ -14,11 +14,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
-import os
 
-from django import forms
 from django.db import models
-from pydub import AudioSegment
 
 
 class AudioFormat(models.TextChoices):
