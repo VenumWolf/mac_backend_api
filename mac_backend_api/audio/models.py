@@ -24,6 +24,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from mac_backend_api.audio.exceptions import UserAlreadyLikesException
+from mac_backend_api.audio.fields import AudioFormat
 
 User = get_user_model()
 
@@ -155,11 +156,6 @@ def get_audio_stream_upload_path(stream, filename) -> str:
 
 
 class AudioStream(models.Model):
-    class AudioFormat(models.TextChoices):
-        MP3 = "mp3"
-        AAC = "aac"
-        OGG = "ogg"
-        WAV = "wav"
 
     id = models.UUIDField(
         primary_key=True,
