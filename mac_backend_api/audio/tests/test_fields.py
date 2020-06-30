@@ -25,11 +25,13 @@ from mac_backend_api.audio.fields import is_valid_extension, AudioFormat
 @pytest.mark.django_db
 class TestAudioFileField(TestCase):
     def test_is_valid_extension(self):
+        """Verifies the is_valid_extension function works with normal input"""
         for extensions in AudioFormat.choices:
             assert is_valid_extension(extensions[0])
         assert not is_valid_extension("not_valid")
 
     def test_is_valid_extension_uppercase_input(self):
+        """Verifies teh is_valid_extension function works with uppercase input"""
         for extensions in AudioFormat.choices:
             assert is_valid_extension(extensions[0].upper())
         assert not is_valid_extension("NOT_VALID")
