@@ -24,7 +24,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from mac_backend_api.audio.exceptions import UserAlreadyLikesException
-from mac_backend_api.audio.fields import AudioFormat
+from mac_backend_api.audio.fields import AudioFormat, AudioBitRate, AudioSampleRate
 
 User = get_user_model()
 
@@ -174,7 +174,14 @@ class AudioStream(models.Model):
         help_text="The format of the audio stream"
     )
     bit_rate = models.IntegerField(
+        choices=AudioBitRate.choices,
+        default=AudioBitRate.AVERAGE,
         help_text="The stream's bit-rate in hz"
+    )
+    sample_rate = models.IntegerField(
+        choices=AudioSampleRate.choices,
+        default=AudioSampleRate.AVERAGE,
+        help_text="The stream's sample-rate in hz"
     )
     allow_downloads = models.BooleanField(
         default=False,
