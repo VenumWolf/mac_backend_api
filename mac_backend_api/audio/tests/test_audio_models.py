@@ -16,6 +16,7 @@
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 import os
 
+import audio_metadata
 import pytest
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -27,7 +28,7 @@ from pydub import AudioSegment
 from pydub.utils import mediainfo
 
 from mac_backend_api.audio.exceptions import UserAlreadyLikesException
-from mac_backend_api.audio.fields import AudioFormat
+from mac_backend_api.audio.fields import AudioFormat, AudioBitRate, AudioSampleRate
 from mac_backend_api.audio.models import Audio, AudioStream, Author, Like, get_audio_stream_upload_path
 
 User = get_user_model()
@@ -112,12 +113,11 @@ class TestAudioStreamModel(TestCase):
                 == f"audio/{self.audio_stream.audio.id}/{self.audio_stream.id}.{self.audio_stream.format}")
 
     def test_audio_conversion(self) -> None:
-        file_path = os.path.join(settings.MEDIA_ROOT, self.audio_stream.file.name)
-        default_storage.path()
-        audio_info = mediainfo(file_path)
-        assert audio_info.get("bit_rate") == self.audio_stream.bit_rate.real
-        assert audio_info.get("sample_rate") == self.audio_Stream.sample_rate.real
-        assert audio_info.get("format_name") == self.audio_stream.format.value
+        audio_info = audio_metadata.loads(self.audio_stream.file.open().read())
+        stream_info = audio_info.get("streaminfo")
+        assert stream_info.get("bitrate") == self.audio_stream.bit_rate.real
+        assert stream_info.get("sample_rate") == self.audio_stream.sample_rate.real
+        assert stream_info.get("format_name") == self.audio_stream.format.value
 
     def __blend_audio_stream(self) -> None:
         segment = AudioSegment.silent(1000)
@@ -126,6 +126,8 @@ class TestAudioStreamModel(TestCase):
         self.audio_stream = mixer.blend(AudioStream,
                                         audio=self.audio,
                                         format=AudioFormat.OGG,
+                                        bit_rate=AudioBitRate.AVERAGE,
+                                        sample_rate=AudioSampleRate.AVERAGE,
                                         file=File(open("test_audio.wav", "rb")))
 
 
