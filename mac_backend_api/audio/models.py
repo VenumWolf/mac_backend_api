@@ -155,11 +155,27 @@ def get_audio_stream_upload_path(stream, filename) -> str:
 
 
 class AudioStream(models.Model):
+
     class AudioFormat(models.TextChoices):
         MP3 = "mp3"
         AAC = "aac"
         OGG = "ogg"
         WAV = "wav"
+
+    class AudioBitRate(models.IntegerChoices):
+        MINIMAL = 32000
+        VERY_LOW = 96000
+        LOW = 128000
+        AVERAGE = 192000
+        HIGH = 256000
+        VERY_HIGH = 320000
+        MAXIMUM = 512000
+
+    class AudioSampleRate(models.IntegerChoices):
+        LOW = 44100
+        AVERAGE = 48000
+        HIGH = 88200
+        VERY_HIGH = 96000
 
     id = models.UUIDField(
         primary_key=True,
@@ -178,12 +194,32 @@ class AudioStream(models.Model):
         help_text="The format of the audio stream"
     )
     bit_rate = models.IntegerField(
+        choices=AudioBitRate.choices,
+        default=AudioBitRate.AVERAGE,
         help_text="The stream's bit-rate in hz"
+    )
+    sample_rate = models.IntegerField(
+        choices=AudioSampleRate.choices,
+        default=AudioSampleRate.AVERAGE,
+        help_text="The stream's sample-rate in hz"
+    )
+    allow_downloads = models.BooleanField(
+        default=False,
+        help_text="Indicates if file should offer a direct download link.",
     )
     file = models.FileField(
         upload_to=get_audio_stream_upload_path,
         help_text="The stream's audio file, it will be processed to match the format and bit_rate values"
     )
+
+    @staticmethod
+    def is_valid_extension(extension) -> bool:
+        """
+        Returns True if a given file extension is a supported format.
+        :param extension: The file extension to check.
+        :return:          True if the file extension is that of a supported audio format.
+        """
+        return extension.lower() in [extension[0] for extension in AudioStream.AudioFormat.choices]
 
 
 class Like(models.Model):
