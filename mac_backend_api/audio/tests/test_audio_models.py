@@ -16,19 +16,14 @@
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 import os
 
-import audio_metadata
 import pytest
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files import File
-from django.core.files.storage import default_storage
 from django.test import TestCase
 from mixer.backend.django import mixer
 from pydub import AudioSegment
-from pydub.utils import mediainfo
 
 from mac_backend_api.audio.exceptions import UserAlreadyLikesException
-from mac_backend_api.audio.fields import AudioFormat, AudioBitRate, AudioSampleRate
 from mac_backend_api.audio.models import Audio, AudioStream, Author, Like, get_audio_stream_upload_path
 
 User = get_user_model()
@@ -112,22 +107,15 @@ class TestAudioStreamModel(TestCase):
         assert (get_audio_stream_upload_path(self.audio_stream, "fake-file-name")
                 == f"audio/{self.audio_stream.audio.id}/{self.audio_stream.id}.{self.audio_stream.format}")
 
-    def test_audio_conversion(self) -> None:
-        audio_info = audio_metadata.loads(self.audio_stream.file.open().read())
-        stream_info = audio_info.get("streaminfo")
-        assert stream_info.get("bitrate") == self.audio_stream.bit_rate.real
-        assert stream_info.get("sample_rate") == self.audio_stream.sample_rate.real
-        assert stream_info.get("format_name") == self.audio_stream.format.value
-
     def test_is_valid_extension(self):
         """Verifies the is_valid_extension function works with normal input"""
-        for extensions in AudioFormat.choices:
+        for extensions in AudioStream.AudioFormat.choices:
             assert AudioStream.is_valid_extension(extensions[0])
         assert not AudioStream.is_valid_extension("not_valid")
 
     def test_is_valid_extension_uppercase_input(self):
         """Verifies the is_valid_extension function works with uppercase input"""
-        for extensions in AudioFormat.choices:
+        for extensions in AudioStream.AudioFormat.choices:
             assert AudioStream.is_valid_extension(extensions[0].upper())
         assert not AudioStream.is_valid_extension("NOT_VALID")
 
@@ -137,9 +125,9 @@ class TestAudioStreamModel(TestCase):
         self.audio = mixer.blend(Audio)
         self.audio_stream = mixer.blend(AudioStream,
                                         audio=self.audio,
-                                        format=AudioFormat.OGG,
-                                        bit_rate=AudioBitRate.AVERAGE,
-                                        sample_rate=AudioSampleRate.AVERAGE,
+                                        format=AudioStream.AudioFormat.OGG,
+                                        bit_rate=AudioStream.AudioBitRate.AVERAGE,
+                                        sample_rate=AudioStream.AudioSampleRate.AVERAGE,
                                         file=File(open("test_audio.wav", "rb")))
 
 

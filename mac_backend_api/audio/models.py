@@ -24,7 +24,6 @@ from django.urls import reverse
 from django.utils import timezone
 
 from mac_backend_api.audio.exceptions import UserAlreadyLikesException
-from mac_backend_api.audio.fields import AudioFormat, AudioBitRate, AudioSampleRate
 
 User = get_user_model()
 
@@ -220,7 +219,7 @@ class AudioStream(models.Model):
         :param extension: The file extension to check.
         :return:          True if the file extension is that of a supported audio format.
         """
-        return extension.lower() in [extension[0] for extension in AudioFormat.choices]
+        return extension.lower() in [extension[0] for extension in AudioStream.AudioFormat.choices]
 
 
 class Like(models.Model):
