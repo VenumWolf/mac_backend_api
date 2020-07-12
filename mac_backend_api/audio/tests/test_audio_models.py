@@ -119,6 +119,18 @@ class TestAudioStreamModel(TestCase):
         assert stream_info.get("sample_rate") == self.audio_stream.sample_rate.real
         assert stream_info.get("format_name") == self.audio_stream.format.value
 
+    def test_is_valid_extension(self):
+        """Verifies the is_valid_extension function works with normal input"""
+        for extensions in AudioFormat.choices:
+            assert AudioStream.is_valid_extension(extensions[0])
+        assert not AudioStream.is_valid_extension("not_valid")
+
+    def test_is_valid_extension_uppercase_input(self):
+        """Verifies the is_valid_extension function works with uppercase input"""
+        for extensions in AudioFormat.choices:
+            assert AudioStream.is_valid_extension(extensions[0].upper())
+        assert not AudioStream.is_valid_extension("NOT_VALID")
+
     def __blend_audio_stream(self) -> None:
         segment = AudioSegment.silent(1000)
         segment.export("test_audio.wav", format="wav")
