@@ -49,14 +49,3 @@ def is_valid_extension(extension) -> bool:
     :return:          True if the file extension is that of a supported audio format.
     """
     return extension.lower() in [extension[0] for extension in AudioFormat.choices]
-
-
-class AudioFileField(models.FileField):
-
-    def __init__(self, format=AudioFormat.OGG, bit_rate=AudioBitRate.AVERAGE,
-                 sample_rate=AudioSampleRate.AVERAGE, **kwargs):
-        self.format = format
-        self.bit_rate = bit_rate
-        self.sample_rate = sample_rate
-        super().__init__(**kwargs)
-
