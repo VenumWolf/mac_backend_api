@@ -74,4 +74,4 @@ class TestAudioViewSet(TestCase):
         assert data.get("uploaded_at") == audio.uploaded_at.strftime(settings.DATETIME_FORMAT)
         assert data.get("is_public") == audio.is_public
         assert data.get("url") == f"http://testserver{audio.get_absolute_url()}"
-        assert data.get("streams") is not None
+        assert data.get("streams") is not None  # Audio tests do not need to verify this, but it should never be None.
