@@ -22,12 +22,13 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from mixer.backend.django import mixer
 
-from mac_backend_api.audio.models import Audio
+from mac_backend_api.audio.models import Audio, AudioStream
 
 
 class TestAudioViewSet(TestCase):
     def setUp(self) -> None:
         self.audio = mixer.blend(Audio, is_public=True)
+        self.stream = mixer.blend(AudioStream, audio=self.audio);
         self.client = Client()
 
     def test_list(self):
@@ -65,13 +66,12 @@ class TestAudioViewSet(TestCase):
 
     @staticmethod
     def __verify_audio_matches_data(audio, data):
-        assert data == {
-            "id": str(audio.id),
-            "title": audio.title,
-            "slug": audio.slug,
-            "description": audio.description,
-            "listen_count": audio.listen_count,
-            "uploaded_at": audio.uploaded_at.strftime(settings.DATETIME_FORMAT),
-            "is_public": audio.is_public,
-            "url": f"http://testserver{audio.get_absolute_url()}"
-        }
+        assert data.get("id") == str(audio.id)
+        assert data.get("title") == audio.title
+        assert data.get("slug") == audio.slug
+        assert data.get("description") == audio.description
+        assert data.get("listen_count") == audio.listen_count
+        assert data.get("uploaded_at") == audio.uploaded_at.strftime(settings.DATETIME_FORMAT)
+        assert data.get("is_public") == audio.is_public
+        assert data.get("url") == f"http://testserver{audio.get_absolute_url()}"
+        assert data.get("streams") is not None
