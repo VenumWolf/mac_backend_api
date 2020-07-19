@@ -18,8 +18,8 @@
 from rest_framework import mixins
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
-from mac_backend_api.audio.api.serializers import AudioSerializer
-from mac_backend_api.audio.models import Audio
+from mac_backend_api.audio.api.serializers import AudioSerializer, StreamSerializer
+from mac_backend_api.audio.models import Audio, AudioStream
 
 
 class AudioViewSet(ModelViewSet):
@@ -31,3 +31,9 @@ class AudioViewSet(ModelViewSet):
         if self.action == "list":
             queryset = queryset.filter(is_public=True)
         return queryset
+
+
+class StreamViewSet(ModelViewSet):
+    serializer_class = StreamSerializer
+    lookup_field = "id"
+    queryset = AudioStream.objects.all()
