@@ -17,7 +17,7 @@
 
 from rest_framework import serializers
 
-from mac_backend_api.audio.models import Audio, AudioStream
+from mac_backend_api.audio.models import Audio, Stream
 
 
 class StreamSerializer(serializers.ModelSerializer):
@@ -28,7 +28,7 @@ class StreamSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = AudioStream
+        model = Stream
         fields = ["id", "url", "audio", "format", "bit_rate", "sample_rate", "allow_downloads", "file"]
 
         extra_kwargs = {

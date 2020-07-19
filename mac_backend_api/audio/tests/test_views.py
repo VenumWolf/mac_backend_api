@@ -22,13 +22,13 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from mixer.backend.django import mixer
 
-from mac_backend_api.audio.models import Audio, AudioStream
+from mac_backend_api.audio.models import Audio, Stream
 
 
 class TestAudioViewSet(TestCase):
     def setUp(self) -> None:
         self.audio = mixer.blend(Audio, is_public=True)
-        self.stream = mixer.blend(AudioStream, audio=self.audio)
+        self.stream = mixer.blend(Stream, audio=self.audio)
         self.client = Client()
 
     def test_list(self):
@@ -80,7 +80,7 @@ class TestAudioViewSet(TestCase):
 class TestStreamViewSet(TestCase):
     def setUp(self) -> None:
         self.audio = mixer.blend(Audio)
-        self.stream = mixer.blend(AudioStream, audio=self.audio)
+        self.stream = mixer.blend(Stream, audio=self.audio)
         self.client = Client()
 
     def test_list(self):

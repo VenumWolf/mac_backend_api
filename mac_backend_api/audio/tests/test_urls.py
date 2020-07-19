@@ -19,7 +19,7 @@ import pytest
 from django.urls import resolve, reverse
 from mixer.backend.django import mixer
 
-from mac_backend_api.audio.models import Audio, AudioStream
+from mac_backend_api.audio.models import Audio, Stream
 
 
 @pytest.mark.django_db
@@ -37,7 +37,7 @@ class TestAudioUrls:
 @pytest.mark.django_db
 class TestStreamUrls:
     def test_stream_detail(self):
-        stream = mixer.blend(AudioStream)
+        stream = mixer.blend(Stream)
         assert reverse("api:stream-detail", kwargs={"id": stream.id}) == f"/api/stream/{stream.id}/"
         assert resolve(f"/api/stream/{stream.id}/").view_name == "api:stream-detail"
 
