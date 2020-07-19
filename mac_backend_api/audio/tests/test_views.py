@@ -75,3 +75,25 @@ class TestAudioViewSet(TestCase):
         assert data.get("is_public") == audio.is_public
         assert data.get("url") == f"http://testserver{audio.get_absolute_url()}"
         assert data.get("streams") is not None  # Audio tests do not need to verify this, but it should never be None.
+
+
+class TestStreamViewSet(TestCase):
+    def setUp(self) -> None:
+        self.audio = mixer.blend(Audio)
+        self.stream = mixer.blend(AudioStream, audio=self.audio)
+        self.client = Client()
+
+    def test_list(self):
+        response = self.client.get(reverse("api:stream-list"))
+        assert response.status_code == 200
+        assert len(response.data) == 1
+
+    def test_detail_get(self):
+        response = self.client.get(reverse("api:stream-detail", kwargs={"id": self.stream.id}))
+        assert response.status_code == 200
+        TestStreamViewSet.__verify_stream_matches_data(self.audio, response.data)
+
+    @staticmethod
+    def __verify_stream_matches_data(stream, data):
+        assert data.get("id") == str(stream.id)
+        assert data.get("url") == f"http://testserver{stream.get_absolute_url()}"
