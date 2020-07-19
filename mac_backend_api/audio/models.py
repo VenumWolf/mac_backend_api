@@ -155,6 +155,11 @@ def get_audio_stream_upload_path(stream, filename) -> str:
 
 
 class AudioStream(models.Model):
+    """
+    Provides access, information, and processing of uploaded audio.  Stream is responsible for ensuring the audio
+    information it provides is correct.  This implementation will process the audio data to match the stored
+    information.
+    """
 
     class AudioFormat(models.TextChoices):
         MP3 = "mp3"
