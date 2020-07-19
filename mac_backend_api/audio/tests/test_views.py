@@ -28,7 +28,7 @@ from mac_backend_api.audio.models import Audio, AudioStream
 class TestAudioViewSet(TestCase):
     def setUp(self) -> None:
         self.audio = mixer.blend(Audio, is_public=True)
-        self.stream = mixer.blend(AudioStream, audio=self.audio);
+        self.stream = mixer.blend(AudioStream, audio=self.audio)
         self.client = Client()
 
     def test_list(self):
