@@ -91,7 +91,7 @@ class TestStreamViewSet(TestCase):
     def test_detail_get(self):
         response = self.client.get(reverse("api:stream-detail", kwargs={"id": self.stream.id}))
         assert response.status_code == 200
-        TestStreamViewSet.__verify_stream_matches_data(self.audio, response.data)
+        TestStreamViewSet.__verify_stream_matches_data(self.stream, response.data)
 
     @staticmethod
     def __verify_stream_matches_data(stream, data):
