@@ -218,6 +218,14 @@ class Stream(models.Model):
         help_text="The stream's audio file, it will be processed to match the format and bit_rate values"
     )
 
+    def get_absolute_url(self) -> str:
+        """
+        Resolves a working URL for accessing the Stream over HTTP
+
+        :return: The URL path to the Stream
+        """
+        return reverse("api:stream-detail", kwargs={"id": self.id})
+
     @staticmethod
     def is_valid_extension(extension) -> bool:
         """
@@ -226,6 +234,7 @@ class Stream(models.Model):
         :return:          True if the file extension is that of a supported audio format.
         """
         return extension.lower() in [extension[0] for extension in Stream.AudioFormat.choices]
+
 
 
 class Like(models.Model):
