@@ -42,5 +42,5 @@ class TestStreamUrls:
         assert resolve(f"/api/stream/{stream.id}/").view_name == "api:stream-detail"
 
     def test_audio_list(self):
-        assert reverse("api:stream-list") == "api/stream/"
+        assert reverse("api:stream-list") == "/api/stream/"
         assert resolve("/api/stream/").view_name == "api:stream-list"
