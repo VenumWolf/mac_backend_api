@@ -17,13 +17,44 @@
 
 from rest_framework import serializers
 
-from mac_backend_api.audio.models import Audio
+from mac_backend_api.audio.models import Audio, AudioStream
+
+
+class StreamSerializer(serializers.ModelSerializer):
+    audio = serializers.HyperlinkedRelatedField(
+        lookup_field="id",
+        read_only=True,
+        view_name="api:audio-detail"
+    )
+
+    class Meta:
+        model = AudioStream
+        fields = ["id", "url", "audio", "format", "bit_rate", "sample_rate", "allow_downloads", "file"]
+
+        extra_kwargs = {
+            "url": {"view_name": "api:stream-detail", "lookup_field": "id"}
+        }
 
 
 class AudioSerializer(serializers.ModelSerializer):
+    streams = serializers.HyperlinkedRelatedField(
+        lookup_field="id",
+        many=True,
+        read_only=True,
+        view_name="api:stream-detail"
+    )
+
+    authors = serializers.HyperlinkedRelatedField(
+        lookup_field="id",
+        many=True,
+        read_only=True,
+        view_name="api:user-detail"
+    )
+
     class Meta:
         model = Audio
-        fields = ["id", "title", "slug", "description", "listen_count", "uploaded_at", "is_public", "url"]
+        fields = ["id", "title", "slug", "url", "description", "listen_count", "uploaded_at", "is_public", "authors",
+                  "streams"]
 
         extra_kwargs = {
             "url": {"view_name": "api:audio-detail", "lookup_field": "id"}
