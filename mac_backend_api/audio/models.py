@@ -191,6 +191,7 @@ class AudioStream(models.Model):
     audio = models.ForeignKey(
         to=Audio,
         on_delete=models.CASCADE,
+        related_name="streams",
         help_text="A reference to the Audio instance"
     )
     format = models.CharField(
