@@ -20,7 +20,8 @@ from django.test import TestCase, RequestFactory
 from mixer.backend.django import mixer
 from rest_framework.test import APIRequestFactory
 
-from mac_backend_api.audio.api.serializers import AudioSerializer
+from django.conf import settings
+from mac_backend_api.audio.api.serializers import AudioSerializer, StreamSerializer
 from mac_backend_api.audio.models import Audio, Stream
 
 
@@ -34,17 +35,4 @@ class TestAudioSerializer(TestCase):
     def test_fields(self) -> None:
         assert list(self.serialized_audio.data.keys()) == ["id", "title", "slug", "url", "description", "listen_count",
                                                            "uploaded_at", "is_public", "authors", "streams"]
-
-    def test_values(self) -> None:
-        data = self.serialized_audio.data
-        assert data.get("id") == self.audio.id
-        assert data.get("title") == self.audio.title
-        assert data.get("slug") == self.audio.slug
-        assert data.get("url") == self.audio.url
-        assert data.get("description") == self.audio.description
-        assert data.get("listen_count") == self.audio.listen_count
-        assert data.get("uploaded_at") == self.audio.uploaded_at
-        assert data.get("is_public") == self.audio.is_public
-        assert data.get("authors") == self.audio.authors
-        assert data.get("streams") == self.audio.streams
 
