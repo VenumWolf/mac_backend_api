@@ -38,7 +38,8 @@ class StreamSerializer(serializers.ModelSerializer):
 
 class NestedStreamSerializer(serializers.ModelSerializer):
     """
-    A Stream Serializer for embedding in the audio
+    This serializer is used primarily by AudioSerializer.  It is the same as StreamSerializer, except it does not
+    include a redundant Audio link.
     """
     class Meta:
         model = Stream
