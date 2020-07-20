@@ -36,12 +36,23 @@ class StreamSerializer(serializers.ModelSerializer):
         }
 
 
+class AudioStreamSerializer(serializers.ModelSerializer):
+    """
+    A Stream Serializer for embedding in the audio
+    """
+    class Meta:
+        model = Stream
+        fields = ["id", "url", "format", "bit_rate", "sample_rate", "allow_downloads", "file"]
+
+        extra_kwargs = {
+            "url": {"view_name": "api:stream-detail", "lookup_field": "id"}
+        }
+
+
 class AudioSerializer(serializers.ModelSerializer):
-    streams = serializers.HyperlinkedRelatedField(
-        lookup_field="id",
+    streams = AudioStreamSerializer(
         many=True,
         read_only=True,
-        view_name="api:stream-detail"
     )
 
     authors = serializers.HyperlinkedRelatedField(
