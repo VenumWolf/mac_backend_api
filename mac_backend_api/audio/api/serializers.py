@@ -36,7 +36,7 @@ class StreamSerializer(serializers.ModelSerializer):
         }
 
 
-class AudioStreamSerializer(serializers.ModelSerializer):
+class NestedStreamSerializer(serializers.ModelSerializer):
     """
     A Stream Serializer for embedding in the audio
     """
@@ -50,7 +50,7 @@ class AudioStreamSerializer(serializers.ModelSerializer):
 
 
 class AudioSerializer(serializers.ModelSerializer):
-    streams = AudioStreamSerializer(
+    streams = NestedStreamSerializer(
         many=True,
         read_only=True,
     )
