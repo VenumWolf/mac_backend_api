@@ -48,7 +48,7 @@ class StreamAdmin(admin.ModelAdmin):
 
 
 @admin.register(Like)
-class StreamAdmin(admin.ModelAdmin):
+class LikeAdmin(admin.ModelAdmin):
     list_display = ["audio__title", "user"]
     search_fields = ["user__username", "audio__title"]
 
