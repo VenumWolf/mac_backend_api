@@ -57,7 +57,7 @@ class AudioSerializer(serializers.ModelSerializer):
     )
 
     authors = serializers.HyperlinkedRelatedField(
-        lookup_field="id",
+        lookup_field="username",
         many=True,
         read_only=True,
         view_name="api:user-detail"
