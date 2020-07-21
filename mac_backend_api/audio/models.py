@@ -28,17 +28,6 @@ from mac_backend_api.audio.exceptions import UserAlreadyLikesException
 User = get_user_model()
 
 
-class Author(models.Model):
-    """
-    Provides a layer over the User model.  Audios may be accessed as a queryset through the `audio_set` parameter.
-    """
-    user = models.ForeignKey(
-        to=User,
-        on_delete=models.CASCADE,
-        help_text="A reference to the User instance"
-    )
-
-
 class Audio(models.Model):
     """
     Provides information storage for an uploaded audio.  The file information is stored on `Stream` objects.
@@ -71,8 +60,8 @@ class Audio(models.Model):
         help_text="A short description for the audio"
     )
     authors = models.ManyToManyField(
-        to=Author,
-        help_text="References to the authors audios"
+        to=User,
+        help_text="References to the audio's authors"
     )
     listen_count = models.IntegerField(
         default=0,

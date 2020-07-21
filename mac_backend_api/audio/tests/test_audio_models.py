@@ -24,7 +24,7 @@ from mixer.backend.django import mixer
 from pydub import AudioSegment
 
 from mac_backend_api.audio.exceptions import UserAlreadyLikesException
-from mac_backend_api.audio.models import Audio, Stream, Author, Like, get_audio_stream_upload_path
+from mac_backend_api.audio.models import Audio, Stream, Like, get_audio_stream_upload_path
 
 User = get_user_model()
 
@@ -88,7 +88,7 @@ class TestAudioModel(TestCase):
 
     def __blend_audio_and_author(self) -> None:
         self.audio = mixer.blend(Audio)
-        self.author = mixer.blend(Author)
+        self.author = mixer.blend(User)
         self.user = mixer.blend(User)
         self.audio.authors.add(self.author)
         self.audio.views = 0
