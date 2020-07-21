@@ -14,14 +14,17 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
+import os
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.core.files import File
 from django.test import TestCase
 from mixer.backend.django import mixer
+from pydub import AudioSegment
 
 from mac_backend_api.audio.exceptions import UserAlreadyLikesException
-from mac_backend_api.audio.models import Audio, AudioStream, Author, Like, get_audio_stream_upload_path
+from mac_backend_api.audio.models import Audio, Stream, Author, Like, get_audio_stream_upload_path
 
 User = get_user_model()
 
@@ -95,12 +98,37 @@ class TestAudioModel(TestCase):
 @pytest.mark.django_db
 class TestAudioStreamModel(TestCase):
     def setUp(self) -> None:
-        self.audio = mixer.blend(Audio)
-        self.audio_stream = mixer.blend(AudioStream, audio=self.audio)
+        self.__blend_audio_stream()
+
+    def tearDown(self) -> None:
+        os.remove("test_audio.wav")
 
     def test_get_audio_stream_upload_path(self):
         assert (get_audio_stream_upload_path(self.audio_stream, "fake-file-name")
                 == f"audio/{self.audio_stream.audio.id}/{self.audio_stream.id}.{self.audio_stream.format}")
+
+    def test_is_valid_extension(self):
+        """Verifies the is_valid_extension function works with normal input"""
+        for extensions in Stream.AudioFormat.choices:
+            assert Stream.is_valid_extension(extensions[0])
+        assert not Stream.is_valid_extension("not_valid")
+
+    def test_is_valid_extension_uppercase_input(self):
+        """Verifies the is_valid_extension function works with uppercase input"""
+        for extensions in Stream.AudioFormat.choices:
+            assert Stream.is_valid_extension(extensions[0].upper())
+        assert not Stream.is_valid_extension("NOT_VALID")
+
+    def __blend_audio_stream(self) -> None:
+        segment = AudioSegment.silent(1000)
+        segment.export("test_audio.wav", format="wav")
+        self.audio = mixer.blend(Audio)
+        self.audio_stream = mixer.blend(Stream,
+                                        audio=self.audio,
+                                        format=Stream.AudioFormat.OGG,
+                                        bit_rate=Stream.AudioBitRate.AVERAGE,
+                                        sample_rate=Stream.AudioSampleRate.AVERAGE,
+                                        file=File(open("test_audio.wav", "rb")))
 
 
 @pytest.mark.django_db
