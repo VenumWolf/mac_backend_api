@@ -17,4 +17,15 @@
 
 from django.contrib import admin
 
-# Register your models here.
+from mac_backend_api.audio.models import Audio, Stream
+
+
+class StreamInline(admin.StackedInline):
+    model = Stream
+
+
+@admin.register(Audio)
+class AudioAdmin(admin.ModelAdmin):
+    list_display = ["title", "uploaded_at", "is_public", "listen_count", "like_count"]
+    search_fields = ["title", "authors__username", "streams__format", "streams__bit_rate", "streams__sample_rate"]
+    inlines = [StreamInline]
