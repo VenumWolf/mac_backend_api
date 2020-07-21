@@ -17,7 +17,7 @@
 from django.conf import settings
 from django.contrib import admin
 
-from mac_backend_api.audio.models import Audio, Stream
+from mac_backend_api.audio.models import Audio, Stream, Like
 
 
 class StreamInline(admin.StackedInline):
@@ -45,3 +45,12 @@ class StreamAdmin(admin.ModelAdmin):
 
     def audio__uploaded_at(self, instance) -> str:
         return instance.audio.uploaded_at
+
+
+@admin.register(Like)
+class StreamAdmin(admin.ModelAdmin):
+    list_display = ["audio__title", "user"]
+    search_fields = ["user__username", "audio__title"]
+
+    def audio__title(self, instance) -> str:
+        return instance.audio.title
