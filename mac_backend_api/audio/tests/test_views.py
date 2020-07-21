@@ -15,19 +15,18 @@
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
-import json
-
 from django.conf import settings
 from django.test import TestCase, Client
 from django.urls import reverse
 from mixer.backend.django import mixer
 
-from mac_backend_api.audio.models import Audio
+from mac_backend_api.audio.models import Audio, Stream
 
 
 class TestAudioViewSet(TestCase):
     def setUp(self) -> None:
         self.audio = mixer.blend(Audio, is_public=True)
+        self.stream = mixer.blend(Stream, audio=self.audio)
         self.client = Client()
 
     def test_list(self):
@@ -65,13 +64,40 @@ class TestAudioViewSet(TestCase):
 
     @staticmethod
     def __verify_audio_matches_data(audio, data):
-        assert data == {
-            "id": str(audio.id),
-            "title": audio.title,
-            "slug": audio.slug,
-            "description": audio.description,
-            "listen_count": audio.listen_count,
-            "uploaded_at": audio.uploaded_at.strftime(settings.DATETIME_FORMAT),
-            "is_public": audio.is_public,
-            "url": f"http://testserver{audio.get_absolute_url()}"
-        }
+        assert data.get("id") == str(audio.id)
+        assert data.get("title") == audio.title
+        assert data.get("slug") == audio.slug
+        assert data.get("description") == audio.description
+        assert data.get("listen_count") == audio.listen_count
+        assert data.get("uploaded_at") == audio.uploaded_at.strftime(settings.DATETIME_FORMAT)
+        assert data.get("is_public") == audio.is_public
+        assert data.get("url") == f"http://testserver{audio.get_absolute_url()}"
+        assert data.get("streams") is not None  # Audio tests do not need to verify this, but it should never be None.
+
+
+class TestStreamViewSet(TestCase):
+    def setUp(self) -> None:
+        self.audio = mixer.blend(Audio)
+        self.stream = mixer.blend(Stream, audio=self.audio)
+        self.client = Client()
+
+    def test_list(self):
+        response = self.client.get(reverse("api:stream-list"))
+        assert response.status_code == 200
+        assert len(response.data) == 1
+
+    def test_detail_get(self):
+        response = self.client.get(reverse("api:stream-detail", kwargs={"id": self.stream.id}))
+        assert response.status_code == 200
+        TestStreamViewSet.__verify_stream_matches_data(self.stream, response.data)
+
+    @staticmethod
+    def __verify_stream_matches_data(stream, data):
+        assert data.get("id") == str(stream.id)
+        assert data.get("url") == f"http://testserver{stream.get_absolute_url()}"
+        assert data.get("audio") == f"http://testserver{stream.audio.get_absolute_url()}"
+        assert data.get("format") == stream.format
+        assert data.get("bit_rate") == stream.bit_rate
+        assert data.get("sample_rate") == stream.sample_rate
+        assert data.get("allow_downloads") == stream.allow_downloads
+        assert data.get("file") == f"http://testserver/media/{stream.file.name}"

@@ -17,13 +17,56 @@
 
 from rest_framework import serializers
 
-from mac_backend_api.audio.models import Audio
+from mac_backend_api.audio.models import Audio, Stream
+
+
+class StreamSerializer(serializers.ModelSerializer):
+    audio = serializers.HyperlinkedRelatedField(
+        lookup_field="id",
+        read_only=True,
+        view_name="api:audio-detail"
+    )
+
+    class Meta:
+        model = Stream
+        fields = ["id", "url", "audio", "format", "bit_rate", "sample_rate", "allow_downloads", "file"]
+
+        extra_kwargs = {
+            "url": {"view_name": "api:stream-detail", "lookup_field": "id"}
+        }
+
+
+class NestedStreamSerializer(serializers.ModelSerializer):
+    """
+    This serializer is used primarily by AudioSerializer.  It is the same as StreamSerializer, except it does not
+    include a redundant Audio link.
+    """
+    class Meta:
+        model = Stream
+        fields = ["id", "url", "format", "bit_rate", "sample_rate", "allow_downloads", "file"]
+
+        extra_kwargs = {
+            "url": {"view_name": "api:stream-detail", "lookup_field": "id"}
+        }
 
 
 class AudioSerializer(serializers.ModelSerializer):
+    streams = NestedStreamSerializer(
+        many=True,
+        read_only=True,
+    )
+
+    authors = serializers.HyperlinkedRelatedField(
+        lookup_field="id",
+        many=True,
+        read_only=True,
+        view_name="api:user-detail"
+    )
+
     class Meta:
         model = Audio
-        fields = ["id", "title", "slug", "description", "listen_count", "uploaded_at", "is_public", "url"]
+        fields = ["id", "title", "slug", "url", "description", "listen_count", "uploaded_at", "is_public", "authors",
+                  "streams"]
 
         extra_kwargs = {
             "url": {"view_name": "api:audio-detail", "lookup_field": "id"}

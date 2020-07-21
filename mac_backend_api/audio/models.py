@@ -154,7 +154,12 @@ def get_audio_stream_upload_path(stream, filename) -> str:
     return f"audio/{stream.audio.id}/{stream.id}.{stream.format}"
 
 
-class AudioStream(models.Model):
+class Stream(models.Model):
+    """
+    Provides access, information, and processing of uploaded audio.  Stream is responsible for ensuring the audio
+    information it provides is correct.  This implementation will process the audio data to match the stored
+    information.
+    """
 
     class AudioFormat(models.TextChoices):
         MP3 = "mp3"
@@ -186,6 +191,7 @@ class AudioStream(models.Model):
     audio = models.ForeignKey(
         to=Audio,
         on_delete=models.CASCADE,
+        related_name="streams",
         help_text="A reference to the Audio instance"
     )
     format = models.CharField(
@@ -212,6 +218,14 @@ class AudioStream(models.Model):
         help_text="The stream's audio file, it will be processed to match the format and bit_rate values"
     )
 
+    def get_absolute_url(self) -> str:
+        """
+        Resolves a working URL for accessing the Stream over HTTP
+
+        :return: The URL path to the Stream
+        """
+        return reverse("api:stream-detail", kwargs={"id": self.id})
+
     @staticmethod
     def is_valid_extension(extension) -> bool:
         """
@@ -219,7 +233,8 @@ class AudioStream(models.Model):
         :param extension: The file extension to check.
         :return:          True if the file extension is that of a supported audio format.
         """
-        return extension.lower() in [extension[0] for extension in AudioStream.AudioFormat.choices]
+        return extension.lower() in [extension[0] for extension in Stream.AudioFormat.choices]
+
 
 
 class Like(models.Model):

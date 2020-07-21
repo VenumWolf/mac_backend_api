@@ -16,10 +16,9 @@
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
 from django.conf import settings
-from django.urls import path, include
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
-from mac_backend_api.audio.api.views import AudioViewSet
+from mac_backend_api.audio.api.views import AudioViewSet, StreamViewSet
 from mac_backend_api.users.api.views import UserViewSet
 
 app_name = "api"
@@ -31,6 +30,7 @@ else:
 
 router.register("users", UserViewSet)
 router.register("audio", AudioViewSet)
+router.register("stream", StreamViewSet)
 
 urlpatterns = [
 ]

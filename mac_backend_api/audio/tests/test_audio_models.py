@@ -24,7 +24,7 @@ from mixer.backend.django import mixer
 from pydub import AudioSegment
 
 from mac_backend_api.audio.exceptions import UserAlreadyLikesException
-from mac_backend_api.audio.models import Audio, AudioStream, Author, Like, get_audio_stream_upload_path
+from mac_backend_api.audio.models import Audio, Stream, Author, Like, get_audio_stream_upload_path
 
 User = get_user_model()
 
@@ -109,25 +109,25 @@ class TestAudioStreamModel(TestCase):
 
     def test_is_valid_extension(self):
         """Verifies the is_valid_extension function works with normal input"""
-        for extensions in AudioStream.AudioFormat.choices:
-            assert AudioStream.is_valid_extension(extensions[0])
-        assert not AudioStream.is_valid_extension("not_valid")
+        for extensions in Stream.AudioFormat.choices:
+            assert Stream.is_valid_extension(extensions[0])
+        assert not Stream.is_valid_extension("not_valid")
 
     def test_is_valid_extension_uppercase_input(self):
         """Verifies the is_valid_extension function works with uppercase input"""
-        for extensions in AudioStream.AudioFormat.choices:
-            assert AudioStream.is_valid_extension(extensions[0].upper())
-        assert not AudioStream.is_valid_extension("NOT_VALID")
+        for extensions in Stream.AudioFormat.choices:
+            assert Stream.is_valid_extension(extensions[0].upper())
+        assert not Stream.is_valid_extension("NOT_VALID")
 
     def __blend_audio_stream(self) -> None:
         segment = AudioSegment.silent(1000)
         segment.export("test_audio.wav", format="wav")
         self.audio = mixer.blend(Audio)
-        self.audio_stream = mixer.blend(AudioStream,
+        self.audio_stream = mixer.blend(Stream,
                                         audio=self.audio,
-                                        format=AudioStream.AudioFormat.OGG,
-                                        bit_rate=AudioStream.AudioBitRate.AVERAGE,
-                                        sample_rate=AudioStream.AudioSampleRate.AVERAGE,
+                                        format=Stream.AudioFormat.OGG,
+                                        bit_rate=Stream.AudioBitRate.AVERAGE,
+                                        sample_rate=Stream.AudioSampleRate.AVERAGE,
                                         file=File(open("test_audio.wav", "rb")))
 
 
