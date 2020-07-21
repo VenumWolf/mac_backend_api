@@ -15,8 +15,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
-import json
-
 from django.conf import settings
 from django.test import TestCase, Client
 from django.urls import reverse
@@ -97,3 +95,9 @@ class TestStreamViewSet(TestCase):
     def __verify_stream_matches_data(stream, data):
         assert data.get("id") == str(stream.id)
         assert data.get("url") == f"http://testserver{stream.get_absolute_url()}"
+        assert data.get("audio") == f"http://testserver{stream.audio.get_absolute_url()}"
+        assert data.get("format") == stream.format
+        assert data.get("bit_rate") == stream.bit_rate
+        assert data.get("sample_rate") == stream.sample_rate
+        assert data.get("allow_downloads") == stream.allow_downloads
+        assert data.get("file") == f"http://testserver/media/{stream.file.name}"
