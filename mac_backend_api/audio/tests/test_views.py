@@ -27,18 +27,36 @@ from mac_backend_api.audio.models import Audio, Stream
 
 def blend_audio(count=1):
     """
-    A helper method for creating audios.
+    A helper method for creating audios.  By Default the audio is unlisted (is_public=False), call
+    make_public(blend_audio()) to generate public audios.
     :param count: The number of audios to blend.
     :return:      An Audio instance if count = 1, or a list of Audio instances if count > 1.
     """
     if count == 1:
-        audio = mixer.blend(Audio)
+        audio = mixer.blend(Audio, is_public=False)
     elif count > 1:
         audio = list()
         for i in range(count):
-            audio.append(mixer.blend(Audio))
+            audio.append(mixer.blend(Audio, is_public=False))
     else:
         audio = list()
+    return audio
+
+
+def make_public(audio) -> None:
+    """
+    Set an Audio instance's visibility to public.
+    :param audio: The Audio instance to make public.
+    :return:      The Audio instance if audio is an Audio, or a list of length = 1, or a list of Audio instances if
+                  audio is a list of length > 1.
+    """
+    if not isinstance(audio, list):
+        audio = [audio]
+    for audio_instance in audio:
+        audio_instance.is_public = True
+        audio_instance.save()
+    if len(audio) == 1:
+        audio = audio[0]
     return audio
 
 
@@ -61,3 +79,15 @@ class TestAudioViewSet(TestCase):
         audio_detail_view = self.view_set.as_view({"get": "retrieve"})
         response = audio_detail_view(request, id="invalid")
         self.assertEquals(response.status_code, 404)
+
+    def test_get_list_view(self) -> None:
+        """Verifies the list view returns with status code 200, and the data contains only public audio."""
+        blend_audio(10)
+        make_public(blend_audio(10))
+        request = self.request_factory.get("")
+        list_view = self.view_set.as_view({"get": "list"})
+        response = list_view(request)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(len(response.data), 10)
+
+
