@@ -14,14 +14,11 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
-import collections
-import json
 
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 from mixer.backend.django import mixer
 from rest_framework.test import APIRequestFactory
 
-from django.conf import settings
 from mac_backend_api.audio.api.serializers import AudioSerializer, StreamSerializer, NestedStreamSerializer
 from mac_backend_api.audio.models import Audio, Stream
 
