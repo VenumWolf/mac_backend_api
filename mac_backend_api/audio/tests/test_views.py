@@ -116,7 +116,7 @@ class TestAudioViewSet(TestCase):
         self.assertEquals(response.status_code, 204)
 
     def test_get_list_view(self) -> None:
-        """Verifies the list view returns with status code 200, and the data contains only public audio."""
+        """Verifies the AudioViewSet's list view data contains only public audio."""
         blend_audio(10)
         make_public(blend_audio(10))
         request = self.request_factory.get("")
