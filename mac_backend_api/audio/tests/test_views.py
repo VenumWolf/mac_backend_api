@@ -15,14 +15,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
-from django.conf import settings
-from django.test import TestCase, Client
-from django.urls import reverse
+from django.test import TestCase
 from mixer.backend.django import mixer
 from rest_framework.test import APIRequestFactory
 
 from mac_backend_api.audio.api.views import AudioViewSet
-from mac_backend_api.audio.models import Audio, Stream
+from mac_backend_api.audio.models import Audio
 
 
 def blend_audio(count=1):
