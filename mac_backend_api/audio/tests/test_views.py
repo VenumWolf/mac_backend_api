@@ -64,6 +64,10 @@ class TestAudioViewSet(TestCase):
     def setUp(self) -> None:
         self.view_set = AudioViewSet
         self.request_factory = APIRequestFactory()
+        self.data = {
+            "title": "Hello, world!",
+            "description": "This is a test."
+        }
 
     def test_get_detail_view(self) -> None:
         """Verifies the AudioViewSet's detail view returns with status code 200 when provided a valid id."""
@@ -80,6 +84,37 @@ class TestAudioViewSet(TestCase):
         response = audio_detail_view(request, id="invalid")
         self.assertEquals(response.status_code, 404)
 
+    def test_put_detail_view_new_audio(self) -> None:
+        """Verifies the AudioViewSet's detail view creates new Audio through a put request."""
+        request = self.request_factory.put("", data=self.data, format="json")
+        update_view = self.view_set.as_view({"put": "create"})
+        response = update_view(request)
+        self.assertEquals(response.status_code, 201)
+
+    def test_put_detail_view_existing_audio(self) -> None:
+        """Verifies the AudioViewSet's detail view updates existing Audio with a put request."""
+        audio = blend_audio()
+        request = self.request_factory.put("", data=self.data, format="json")
+        update_view = self.view_set.as_view({"put": "update"})
+        response = update_view(request, id=audio.id)
+        self.assertEquals(response.status_code, 200)
+
+    def test_patch_detail_view(self) -> None:
+        """Verifies the AudioViewSet's detail view updates existing Audio with a patch request."""
+        audio = blend_audio()
+        request = self.request_factory.patch("", data=self.data, format="json")
+        update_view = self.view_set.as_view({"patch": "partial_update"})
+        response = update_view(request, id=audio.id)
+        self.assertEquals(response.status_code, 200)
+
+    def test_delete_detail_view(self) -> None:
+        """Verifies the AudioViewSet's detail view delete's existing audio with a delete request."""
+        audio = blend_audio()
+        request = self.request_factory.delete("")
+        update_view = self.view_set.as_view({"delete": "destroy"})
+        response = update_view(request, id=audio.id)
+        self.assertEquals(response.status_code, 204)
+
     def test_get_list_view(self) -> None:
         """Verifies the list view returns with status code 200, and the data contains only public audio."""
         blend_audio(10)
@@ -89,5 +124,3 @@ class TestAudioViewSet(TestCase):
         response = list_view(request)
         self.assertEquals(response.status_code, 200)
         self.assertEquals(len(response.data), 10)
-
-
