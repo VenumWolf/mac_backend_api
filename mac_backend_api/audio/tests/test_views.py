@@ -14,12 +14,14 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
+from io import BytesIO
 
+from django.core.files import File
 from django.test import TestCase
 from mixer.backend.django import mixer
 from rest_framework.test import APIRequestFactory
 
-from mac_backend_api.audio.api.views import AudioViewSet
+from mac_backend_api.audio.api.views import AudioViewSet, StreamViewSet
 from mac_backend_api.audio.models import Audio
 
 
@@ -122,3 +124,16 @@ class TestAudioViewSet(TestCase):
         response = list_view(request)
         self.assertEquals(response.status_code, 200)
         self.assertEquals(len(response.data), 10)
+
+
+class TestStreamViewSet(TestCase):
+    def setUp(self) -> None:
+        self.view_set = StreamViewSet
+        self.request_factory = APIRequestFactory()
+        self.data = {
+            "format": "ogg",
+            "bit_rate": 192000,
+            "sample_rate": 48000,
+            "allow_downloads": False,
+            "file": File(BytesIO())
+        }
