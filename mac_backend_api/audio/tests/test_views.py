@@ -22,7 +22,7 @@ from mixer.backend.django import mixer
 from rest_framework.test import APIRequestFactory
 
 from mac_backend_api.audio.api.views import AudioViewSet, StreamViewSet
-from mac_backend_api.audio.models import Audio
+from mac_backend_api.audio.models import Audio, Stream
 
 
 def blend_audio(count=1):
@@ -124,6 +124,23 @@ class TestAudioViewSet(TestCase):
         response = list_view(request)
         self.assertEquals(response.status_code, 200)
         self.assertEquals(len(response.data), 10)
+
+
+def blend_stream(count=1):
+    """
+    A helper method for creating streams.
+    :param count: The number of streams to blend.
+    :return:      A Stream instance if count = 1, or a list of Stream instances if count > 1.
+    """
+    if count == 1:
+        stream = mixer.blend(Stream)
+    elif count > 1:
+        stream = list()
+        for i in range(count):
+            stream.append(mixer.blend(Stream))
+    else:
+        stream = list()
+    return stream
 
 
 class TestStreamViewSet(TestCase):
