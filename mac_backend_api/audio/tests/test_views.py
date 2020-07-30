@@ -154,3 +154,18 @@ class TestStreamViewSet(TestCase):
             "allow_downloads": False,
             "file": File(BytesIO())
         }
+
+    def get_detail_view(self) -> None:
+        """Verifies the detail view returns a status code 200 when provided a valid id."""
+        stream = blend_stream()
+        request = self.request_factory.get("")
+        detail_view = self.view_set.as_view({"get": "retrieve"})
+        response = detail_view(request, id=stream.id)
+        self.assertEquals(response.status_code, 200)
+
+    def test_get_detail_view_invalid_id(self) -> None:
+        """Verifies the detail view returns a 404 when provided an invalid id."""
+        request = self.request_factory.get("")
+        detail_view = self.view_set.as_view({"get": "retrieve"})
+        response = detail_view(request, id="invalid")
+        self.assertEquals(response.status_code, 404)
