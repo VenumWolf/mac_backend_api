@@ -147,12 +147,13 @@ class TestStreamViewSet(TestCase):
     def setUp(self) -> None:
         self.view_set = StreamViewSet
         self.request_factory = APIRequestFactory()
+        self.file = BytesIO(b"contents")
+        self.file.name = "test_file.ogg"
         self.data = {
             "format": "ogg",
             "bit_rate": 192000,
             "sample_rate": 48000,
             "allow_downloads": False,
-            "file": File(BytesIO())
         }
 
     def get_detail_view(self) -> None:
@@ -169,3 +170,36 @@ class TestStreamViewSet(TestCase):
         detail_view = self.view_set.as_view({"get": "retrieve"})
         response = detail_view(request, id="invalid")
         self.assertEquals(response.status_code, 404)
+
+    def test_put_detail_view_new_stream(self) -> None:
+        """Verifies the detail view creates new Audio through a PUT request."""
+        data = self.data
+        data["file"] = self.file
+        request = self.request_factory.put("", data=data, format="multipart")
+        update_view = self.view_set.as_view({"put": "create"})
+        response = update_view(request)
+        self.assertEquals(response.status_code, 201)
+
+    def test_put_detail_view_existing_stream(self) -> None:
+        """Verifies the detail view updates existing Audio with a PUT request."""
+        stream = blend_stream()
+        request = self.request_factory.put("", data=self.data, format="json")
+        update_view = self.view_set.as_view({"put": "update"})
+        response = update_view(request, id=stream.id)
+        self.assertEquals(response.status_code, 200)
+
+    def test_patch_detail_view(self) -> None:
+        """Verifies the detail view updates existing Audio with a PATCH request."""
+        stream = blend_stream()
+        request = self.request_factory.patch("", data=self.data, format="json")
+        update_view = self.view_set.as_view({"patch": "partial_update"})
+        response = update_view(request, id=stream.id)
+        self.assertEquals(response.status_code, 200)
+
+    def test_delete_detail_view(self) -> None:
+        """Verifies the detail view delete's existing audio with a DELETE request."""
+        stream = blend_stream()
+        request = self.request_factory.delete("")
+        update_view = self.view_set.as_view({"delete": "destroy"})
+        response = update_view(request, id=stream.id)
+        self.assertEquals(response.status_code, 204)
