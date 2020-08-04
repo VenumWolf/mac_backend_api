@@ -16,20 +16,35 @@
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 from io import BytesIO
 
+import pytest
 from django.test import TestCase
 
-from mac_backend_api.audio.forms import AudioCreationForm
+from mac_backend_api.audio.forms import AudioCreationForm, AudioUpdateForm
 
 
+@pytest.mark.django_db
 class TestAudioCreationForm(TestCase):
     def setUp(self) -> None:
         pass
 
-    def get_form(self, title="Test", description="Test", is_public=True, file=BytesIO(b"content")):
+    def get_form(self, title="Test", description="Test", is_public=True, file=BytesIO(b"content")) -> AudioCreationForm:
         file.name = "test_file.mp3"
         return AudioCreationForm({
             "title": title,
             "description": description,
             "is_public": is_public,
             "file": file
+        })
+
+
+@pytest.mark.django_db
+class TestAudioUpdateForm(TestCase):
+    def setUp(self) -> None:
+        pass
+
+    def get_form(self, title="Test", description="Test", is_public=True) -> AudioUpdateForm:
+        return AudioUpdateForm({
+            "title": title,
+            "description": description,
+            "is_public": is_public
         })
