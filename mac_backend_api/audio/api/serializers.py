@@ -23,8 +23,13 @@ from mac_backend_api.audio.models import Audio, Stream
 class StreamSerializer(serializers.ModelSerializer):
     audio = serializers.HyperlinkedRelatedField(
         lookup_field="id",
-        read_only=True,
+        required=False,
+        queryset=Audio.objects.all(),
         view_name="api:audio-detail"
+    )
+
+    file = serializers.FileField(
+        required=False,
     )
 
     class Meta:
