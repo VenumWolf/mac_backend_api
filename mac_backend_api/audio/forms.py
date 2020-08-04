@@ -20,12 +20,18 @@ from django import forms
 from mac_backend_api.audio.models import Audio
 
 
-class AudioUpdateForm(forms.ModelForm):
+class AudioForm(forms.ModelForm):
+    class Meta:
+        model = Audio
+        exclude = []
+
+
+class AudioUpdateForm(AudioForm):
     class Meta:
         model = Audio
 
 
-class AudioCreationForm(forms.ModelForm):
+class AudioCreationForm(AudioForm):
     class Meta:
         model = Audio
 
