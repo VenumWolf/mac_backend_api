@@ -16,7 +16,6 @@
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 from io import BytesIO
 
-from django.core.files import File
 from django.test import TestCase
 from mixer.backend.django import mixer
 from rest_framework.test import APIRequestFactory
