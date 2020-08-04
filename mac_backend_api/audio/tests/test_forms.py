@@ -14,6 +14,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
+
 from io import BytesIO
 
 import pytest
@@ -24,11 +25,30 @@ from mac_backend_api.audio.forms import AudioCreationForm, AudioUpdateForm
 
 @pytest.mark.django_db
 class TestAudioCreationForm(TestCase):
-    def setUp(self) -> None:
-        pass
+    def test_valid_file(self) -> None:
+        """Verify the form is valid when a non-empty file is provided."""
+        form = self.get_form()
+        self.assertTrue(form.is_valid)
+
+    def test_no_file(self) -> None:
+        """Verifies the form is invalid no file is provided."""
+        form = self.get_form(file=None)
+        self.__assert_file_errors(form)
+
+    def test_empty_file(self) -> None:
+        """Verifies the form is invalid when an empty file is provided."""
+        form = self.get_form(file=BytesIO())
+        self.__assert_file_errors(form)
+
+    def __assert_file_errors(self, form) -> None:
+        """Asserts the form is invalid because of the 'file' field."""
+        self.assertFalse(form.is_valid())
+        self.assertTrue("file" in form.errors)
 
     def get_form(self, title="Test", description="Test", is_public=True, file=BytesIO(b"content")) -> AudioCreationForm:
-        file.name = "test_file.mp3"
+        """Returns a filled AudioCreationForm."""
+        if isinstance(file, BytesIO):
+            file.name = "test_file.mp3"
         return AudioCreationForm({
             "title": title,
             "description": description,
