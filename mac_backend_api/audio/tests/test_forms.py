@@ -55,16 +55,3 @@ class TestAudioCreationForm(TestCase):
             "is_public": is_public,
             "file": file
         })
-
-
-@pytest.mark.django_db
-class TestAudioUpdateForm(TestCase):
-    def setUp(self) -> None:
-        pass
-
-    def get_form(self, title="Test", description="Test", is_public=True) -> AudioUpdateForm:
-        return AudioUpdateForm({
-            "title": title,
-            "description": description,
-            "is_public": is_public
-        })

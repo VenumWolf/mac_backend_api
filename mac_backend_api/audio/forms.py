@@ -26,9 +26,5 @@ class AudioForm(forms.ModelForm):
         exclude = []
 
 
-class AudioUpdateForm(AudioForm):
-    pass
-
-
 class AudioCreationForm(AudioForm):
     file = forms.FileField()
