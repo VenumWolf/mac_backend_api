@@ -27,12 +27,8 @@ class AudioForm(forms.ModelForm):
 
 
 class AudioUpdateForm(AudioForm):
-    class Meta:
-        model = Audio
+    pass
 
 
 class AudioCreationForm(AudioForm):
-    class Meta:
-        model = Audio
-
     file = forms.FileField()
