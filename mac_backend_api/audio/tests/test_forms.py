@@ -20,7 +20,7 @@ from io import BytesIO
 import pytest
 from django.test import TestCase
 
-from mac_backend_api.audio.forms import AudioCreationForm, AudioUpdateForm
+from mac_backend_api.audio.forms import AudioCreationForm
 
 
 @pytest.mark.django_db
