@@ -20,6 +20,7 @@ from django.test import TestCase
 from mixer.backend.django import mixer
 from rest_framework.test import APIRequestFactory
 
+from mac_backend_api.audio.api.serializers import AudioSerializer
 from mac_backend_api.audio.api.views import AudioViewSet, StreamViewSet
 from mac_backend_api.audio.models import Audio, Stream
 
@@ -173,10 +174,12 @@ class TestStreamViewSet(TestCase):
     def test_put_detail_view_new_stream(self) -> None:
         """Verifies the detail view creates new Audio through a PUT request."""
         data = self.data
+        data["audio"] = blend_audio().get_absolute_url()
         data["file"] = self.file
         request = self.request_factory.put("", data=data, format="multipart")
         update_view = self.view_set.as_view({"put": "create"})
         response = update_view(request)
+        print(response.data)
         self.assertEquals(response.status_code, 201)
 
     def test_put_detail_view_existing_stream(self) -> None:
