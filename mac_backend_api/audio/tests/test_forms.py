@@ -46,7 +46,14 @@ class TestAudioCreationForm(TestCase):
         self.assertTrue("file" in form.errors)
 
     def get_form(self, title="Test", description="Test", is_public=True, file=BytesIO(b"content")) -> AudioCreationForm:
-        """Returns a filled AudioCreationForm."""
+        """
+        Returns an AudioCreationForm filled out with the provided data.
+        :param title:       The title of the Audio.
+        :param description: The description of the Audio.
+        :param is_public:   If the Audio is public.
+        :param file:        The uploaded file data for the Audio.
+        :return: A filled out AudioCreationForm
+        """
         if isinstance(file, BytesIO):
             file.name = "test_file.mp3"
         return AudioCreationForm({
