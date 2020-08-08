@@ -72,23 +72,23 @@ class TestAudioViewSet(TestCase):
             "description": "This is a test."
         }
 
-    def test_get_detail_view(self) -> None:
-        """Verifies the AudioViewSet's detail view returns with status code 200 when provided a valid id."""
+    def test_retrieve_view(self) -> None:
+        """Verifies the retrieve view returns a 200 when provided a valid id."""
         audio = blend_audio()
         request = self.request_factory.get("")
         audio_detail_view = self.view_set.as_view({"get": "retrieve"})
         response = audio_detail_view(request, id=audio.id)
         self.assertEquals(response.status_code, 200)
 
-    def test_get_detail_view_invalid_id(self) -> None:
-        """Verifies the AudioViewSet's detail view returns a 404 when provided an invalid id."""
+    def test_retrieve_view_with_invalid_id(self) -> None:
+        """Verifies the retrieve view returns a 404 when provided an invalid id."""
         request = self.request_factory.get("")
         audio_detail_view = self.view_set.as_view({"get": "retrieve"})
         response = audio_detail_view(request, id="invalid")
         self.assertEquals(response.status_code, 404)
 
-    def test_put_detail_view_new_audio_with_file(self) -> None:
-        """Verifies the AudioViewSet's detail view creates a new Audio through a put request when provided a file."""
+    def test_create_view(self) -> None:
+        """Verifies the create view returns a 201 when provided with valid data."""
         data = self.data
         data["file"] = self.file
         request = self.request_factory.put("", data=data, format="json")
@@ -96,23 +96,23 @@ class TestAudioViewSet(TestCase):
         response = update_view(request)
         self.assertEquals(response.status_code, 201)
 
-    def test_put_detail_view_new_audio_without_file(self) -> None:
+    def test_create_view_without_file(self) -> None:
         """Verifies the create view will raise a 400 error when no file is provided."""
         request = self.request_factory.put("", data=self.data, format="json")
         update_view = self.view_set.as_view({"put": "create"})
         response = update_view(request)
         self.assertEquals(response.status_code, 400)
 
-    def test_put_detail_view_existing_audio(self) -> None:
-        """Verifies the AudioViewSet's detail view updates existing Audio with a put request."""
+    def test_update_view(self) -> None:
+        """Verifies the update view returns a 200 when valid data and no file is provided."""
         audio = blend_audio()
         request = self.request_factory.put("", data=self.data, format="json")
         update_view = self.view_set.as_view({"put": "update"})
         response = update_view(request, id=audio.id)
         self.assertEquals(response.status_code, 200)
 
-    def test_put_detail_view_existing_audio_fails_with_file(self) -> None:
-        """Verifies the update will raise a 400 error when a new file is provided."""
+    def test_update_view_fails_with_file(self) -> None:
+        """Verifies the update view will raise a 400 error when valid data and a new file is provided."""
         audio = blend_audio()
         data = self.data
         data["file"] = self.file
@@ -121,24 +121,34 @@ class TestAudioViewSet(TestCase):
         response = update_view(request, id=audio.id)
         self.assertEquals(response.status_code, 400)
 
-    def test_patch_detail_view(self) -> None:
-        """Verifies the AudioViewSet's detail view updates existing Audio with a patch request."""
+    def test_partial_update_view(self) -> None:
+        """Verifies the partial update view returns a 200 when valid data and no file is provided."""
         audio = blend_audio()
         request = self.request_factory.patch("", data=self.data, format="json")
         update_view = self.view_set.as_view({"patch": "partial_update"})
         response = update_view(request, id=audio.id)
         self.assertEquals(response.status_code, 200)
 
-    def test_delete_detail_view(self) -> None:
-        """Verifies the AudioViewSet's detail view delete's existing audio with a delete request."""
+    def test_partial_update_fails_with_file(self):
+        """Verifies the partial_update view will raise a 400 error when valid data and a new file is provided."""
+        audio = blend_audio()
+        data = self.data
+        data["file"] = self.file
+        request = self.request_factory.put("", data=data, format="json")
+        update_view = self.view_set.as_view({"put": "partial_update"})
+        response = update_view(request, id=audio.id)
+        self.assertEquals(response.status_code, 400)
+
+    def test_delete_view(self) -> None:
+        """Verifies the delete view returns 204 when provided a valid id."""
         audio = blend_audio()
         request = self.request_factory.delete("")
         update_view = self.view_set.as_view({"delete": "destroy"})
         response = update_view(request, id=audio.id)
         self.assertEquals(response.status_code, 204)
 
-    def test_get_list_view(self) -> None:
-        """Verifies the AudioViewSet's list view data contains only public audio."""
+    def test_list_view(self) -> None:
+        """Verifies the AudioViewSet's list view data contains only public audio and returns a 200."""
         blend_audio(10)
         make_public(blend_audio(10))
         request = self.request_factory.get("")
