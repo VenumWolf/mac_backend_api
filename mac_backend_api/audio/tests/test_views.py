@@ -20,9 +20,11 @@ from django.test import TestCase
 from mixer.backend.django import mixer
 from rest_framework.test import APIRequestFactory
 
-from mac_backend_api.audio.api.serializers import AudioSerializer
 from mac_backend_api.audio.api.views import AudioViewSet, StreamViewSet
 from mac_backend_api.audio.models import Audio, Stream
+
+TEST_FILE = BytesIO(b"contents")
+TEST_FILE.name = "test_file.ogg"
 
 
 def blend_audio(count=1):
@@ -147,8 +149,7 @@ class TestStreamViewSet(TestCase):
     def setUp(self) -> None:
         self.view_set = StreamViewSet
         self.request_factory = APIRequestFactory()
-        self.file = BytesIO(b"contents")
-        self.file.name = "test_file.ogg"
+        self.file = TEST_FILE
         self.data = {
             "format": "ogg",
             "bit_rate": 192000,
