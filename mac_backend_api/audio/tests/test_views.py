@@ -66,6 +66,7 @@ class TestAudioViewSet(TestCase):
     def setUp(self) -> None:
         self.view_set = AudioViewSet
         self.request_factory = APIRequestFactory()
+        self.file = TEST_FILE
         self.data = {
             "title": "Hello, world!",
             "description": "This is a test."
@@ -86,12 +87,21 @@ class TestAudioViewSet(TestCase):
         response = audio_detail_view(request, id="invalid")
         self.assertEquals(response.status_code, 404)
 
-    def test_put_detail_view_new_audio(self) -> None:
-        """Verifies the AudioViewSet's detail view creates new Audio through a put request."""
-        request = self.request_factory.put("", data=self.data, format="json")
+    def test_put_detail_view_new_audio_with_file(self) -> None:
+        """Verifies the AudioViewSet's detail view creates a new Audio through a put request when provided a file."""
+        data = self.data
+        data["file"] = self.file
+        request = self.request_factory.put("", data=data, format="json")
         update_view = self.view_set.as_view({"put": "create"})
         response = update_view(request)
         self.assertEquals(response.status_code, 201)
+
+    def test_put_detail_view_new_audio_without_file(self) -> None:
+        """Verifies the create view will raise a 400 error when no file is provided."""
+        request = self.request_factory.put("", data=self.data, format="json")
+        update_view = self.view_set.as_view({"put": "create"})
+        response = update_view(request)
+        self.assertEquals(response.status_code, 400)
 
     def test_put_detail_view_existing_audio(self) -> None:
         """Verifies the AudioViewSet's detail view updates existing Audio with a put request."""
@@ -100,6 +110,16 @@ class TestAudioViewSet(TestCase):
         update_view = self.view_set.as_view({"put": "update"})
         response = update_view(request, id=audio.id)
         self.assertEquals(response.status_code, 200)
+
+    def test_put_detail_view_existing_audio_fails_with_file(self) -> None:
+        """Verifies the update will raise a 400 error when a new file is provided."""
+        audio = blend_audio()
+        data = self.data
+        data["file"] = self.file
+        request = self.request_factory.put("", data=data, format="json")
+        update_view = self.view_set.as_view({"put": "update"})
+        response = update_view(request, id=audio.id)
+        self.assertEquals(response.status_code, 400)
 
     def test_patch_detail_view(self) -> None:
         """Verifies the AudioViewSet's detail view updates existing Audio with a patch request."""
