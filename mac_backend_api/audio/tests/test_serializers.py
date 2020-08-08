@@ -32,7 +32,7 @@ class TestAudioSerializer(TestCase):
 
     def test_fields(self) -> None:
         assert list(self.serialized_audio.data.keys()) == ["id", "title", "slug", "url", "description", "listen_count",
-                                                           "uploaded_at", "is_public", "authors", "streams"]
+                                                           "uploaded_at", "is_public", "authors", "streams", "file"]
 
 
 class TestStreamSerializer(TestCase):
