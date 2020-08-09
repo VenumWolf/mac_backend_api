@@ -77,6 +77,7 @@ class TestAudioViewSet(TestCase):
         }
 
     def test_create_view(self) -> None:
+        """Verify the create view returns a 201 when provided a file and valid data."""
         view = self.view_set.as_view({"post": "create"})
         request = self.request_factory.post("", data=self.data, format="multipart")
         request.FILES["file"] = TEST_FILE
@@ -84,16 +85,16 @@ class TestAudioViewSet(TestCase):
         self.assertEquals(response.status_code, 201, response.data)
 
     def test_create_view_without_file(self) -> None:
+        """Verify the create view returns a 400 with a 'file_not_provided' error message when a file is not provided."""
         view = self.view_set.as_view({"post": "create"})
         request = self.request_factory.post("", data=self.data, format="multipart")
         response = view(request)
         self.assertEquals(response.status_code, 400)
         self.assertEquals(response.data.get("code"), "file_not_provided", msg="A missing file should return a "
-                                                                              "'file_not_found' error message.")
+                                                                              "'file_not_provided' error message.")
 
 
-def blend_stream(count
-                 =1):
+def blend_stream(count=1):
     """
     A helper method for creating streams.
     :param count: The number of streams to blend.
