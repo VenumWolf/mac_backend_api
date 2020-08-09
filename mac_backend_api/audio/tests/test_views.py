@@ -105,7 +105,7 @@ class TestAudioViewSet(TestCase):
         """Verify the update view returns a 400 when a file is provided."""
         audio = blend_audio()
         view = self.view_set.as_view({"post": "update"})
-        request = self.request_factory.post("", data=self.data, format="json")
+        request = self.request_factory.post("", data=self.data, format="multipart")
         request.FILES["file"] = TEST_FILE
         response = view(request, id=audio.id)
         self.assertEquals(response.status_code, 400)
