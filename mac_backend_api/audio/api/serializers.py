@@ -68,11 +68,27 @@ class AudioSerializer(serializers.ModelSerializer):
         view_name="api:user-detail"
     )
 
+    file = serializers.FileField(
+        required=False,
+        help_text=(
+            "A file is only required when creating a new Audio for the first time.  Do not provide a file when making "
+            "update requests."
+        )
+    )
+
     class Meta:
         model = Audio
         fields = ["id", "title", "slug", "url", "description", "listen_count", "uploaded_at", "is_public", "authors",
-                  "streams"]
+                  "streams", "file"]
 
         extra_kwargs = {
             "url": {"view_name": "api:audio-detail", "lookup_field": "id"}
         }
+
+    def create(self, validated_data):
+        """
+        Removes the file field from the data before attempting to create the Audio instance.
+        """
+        if "file" in validated_data.keys():
+            validated_data.pop("file")
+        return super().create(validated_data)
