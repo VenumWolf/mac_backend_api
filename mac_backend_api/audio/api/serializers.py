@@ -78,7 +78,7 @@ class AudioSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Audio
-        fields = ["id", "title", "slug", "url", "description", "listen_count", "uploaded_at", "is_public", "authors",
+        fields = ["id", "title", "url", "description", "listen_count", "uploaded_at", "is_public", "authors",
                   "streams", "file"]
 
         extra_kwargs = {
