@@ -30,6 +30,11 @@ ERROR_DATA = {
     "file_not_provided": {
             "detail": ErrorDetail("File was not provided"),
             "code": "file_not_provided"
+    },
+
+    "file_not_allowed": {
+        "detail": ErrorDetail("File upload is not allowed"),
+        "code": "file_not_allowed"
     }
 }
 
@@ -50,6 +55,13 @@ class AudioViewSet(ModelViewSet):
             response = Response(data=ERROR_DATA.get("file_not_provided"), status=status.HTTP_400_BAD_REQUEST)
         else:
             response = super(AudioViewSet, self).create(request, args, kwargs)
+        return response
+
+    def update(self, request, *args, **kwargs):
+        if request.FILES.get("file") is not None:
+            response = Response(data=ERROR_DATA.get("file_not_allowed"), status=status.HTTP_400_BAD_REQUEST)
+        else:
+            response = super(AudioViewSet, self).update(request, args, kwargs)
         return response
 
 
