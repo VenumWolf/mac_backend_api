@@ -46,14 +46,6 @@ class Audio(models.Model):
         blank=False,
         help_text="Title of the audio"
     )
-    slug = models.SlugField(
-        editable=False,
-        null=True,
-        blank=True,
-        unique=True,
-        max_length=200,
-        help_text="Url-safe representation of the audio title"
-    )
     description = models.TextField(
         max_length=2000,
         blank=True,

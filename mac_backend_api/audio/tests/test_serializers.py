@@ -31,7 +31,7 @@ class TestAudioSerializer(TestCase):
         self.serialized_audio = AudioSerializer(self.audio, context={"request": self.request})
 
     def test_fields(self) -> None:
-        assert list(self.serialized_audio.data.keys()) == ["id", "title", "slug", "url", "description", "listen_count",
+        assert list(self.serialized_audio.data.keys()) == ["id", "title", "url", "description", "listen_count",
                                                            "uploaded_at", "is_public", "authors", "streams"]
 
 
