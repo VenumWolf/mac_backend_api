@@ -93,6 +93,23 @@ class TestAudioViewSet(TestCase):
         self.assertEquals(response.data.get("code"), "file_not_provided", msg="A missing file should return a "
                                                                               "'file_not_provided' error message.")
 
+    def test_update_view(self) -> None:
+        """Verify the update view returns a 200 when provided valid data"""
+        view = self.view_set .as_view({"put": "update"})
+        request = self.request_factory.put("", data=self.data, format="json")
+        response = view(request)
+        self.assertEquals(response.status_code, 200)
+
+    def test_update_view_with_file(self) -> None:
+        """Verify the update view returns a 400 when a file is provided."""
+        view = self.view_set.as_view({"post": "update"})
+        request = self.request_factory.post("", data=self.data, format="json")
+        request.FILES["file"] = TEST_FILE
+        response = view(request)
+        self.assertEquals(response.status_code, 400)
+        self.assertEquals(response.data.get("code"), "file_not_allowed", msg="This view should return a "
+                                                                             "'file_not_allowed' error message.")
+
 
 def blend_stream(count=1):
     """
