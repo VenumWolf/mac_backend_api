@@ -16,6 +16,7 @@
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 from io import BytesIO
 
+from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.test import TestCase
 from mixer.backend.django import mixer
 from rest_framework.test import APIRequestFactory
@@ -23,8 +24,11 @@ from rest_framework.test import APIRequestFactory
 from mac_backend_api.audio.api.views import AudioViewSet, StreamViewSet
 from mac_backend_api.audio.models import Audio, Stream
 
-TEST_FILE = BytesIO(b"contents")
-TEST_FILE.name = "test_file.ogg"
+TEST_FILE_BYTES = BytesIO(b"contents")
+TEST_FILE_BYTES.name = "test.ogg"
+TEST_FILE = TemporaryUploadedFile(name=TEST_FILE_BYTES.name, size=len(TEST_FILE_BYTES.read()), charset=None,
+                                  content_type="audio/ogg")
+TEST_FILE.file = TEST_FILE_BYTES.read()
 
 
 def blend_audio(count=1):
@@ -66,99 +70,30 @@ class TestAudioViewSet(TestCase):
     def setUp(self) -> None:
         self.view_set = AudioViewSet
         self.request_factory = APIRequestFactory()
-        self.file = TEST_FILE
+        self.file = TEST_FILE_BYTES
         self.data = {
             "title": "Hello, world!",
             "description": "This is a test."
         }
 
-    def test_retrieve_view(self) -> None:
-        """Verifies the retrieve view returns a 200 when provided a valid id."""
-        audio = blend_audio()
-        request = self.request_factory.get("")
-        audio_detail_view = self.view_set.as_view({"get": "retrieve"})
-        response = audio_detail_view(request, id=audio.id)
-        self.assertEquals(response.status_code, 200)
-
-    def test_retrieve_view_with_invalid_id(self) -> None:
-        """Verifies the retrieve view returns a 404 when provided an invalid id."""
-        request = self.request_factory.get("")
-        audio_detail_view = self.view_set.as_view({"get": "retrieve"})
-        response = audio_detail_view(request, id="invalid")
-        self.assertEquals(response.status_code, 404)
-
     def test_create_view(self) -> None:
-        """Verifies the create view returns a 201 when provided with valid data."""
-        data = self.data
-        data["file"] = self.file
-        request = self.request_factory.put("", data=data, format="json")
-        update_view = self.view_set.as_view({"put": "create"})
-        response = update_view(request)
-        self.assertEquals(response.status_code, 201)
+        view = self.view_set.as_view({"post": "create"})
+        request = self.request_factory.post("", data=self.data, format="multipart")
+        request.FILES["file"] = TEST_FILE
+        response = view(request)
+        self.assertEquals(response.status_code, 201, response.data)
 
     def test_create_view_without_file(self) -> None:
-        """Verifies the create view will raise a 400 error when no file is provided."""
-        request = self.request_factory.put("", data=self.data, format="json")
-        update_view = self.view_set.as_view({"put": "create"})
-        response = update_view(request)
+        view = self.view_set.as_view({"post": "create"})
+        request = self.request_factory.post("", data=self.data, format="multipart")
+        response = view(request)
         self.assertEquals(response.status_code, 400)
-
-    def test_update_view(self) -> None:
-        """Verifies the update view returns a 200 when valid data and no file is provided."""
-        audio = blend_audio()
-        request = self.request_factory.put("", data=self.data, format="json")
-        update_view = self.view_set.as_view({"put": "update"})
-        response = update_view(request, id=audio.id)
-        self.assertEquals(response.status_code, 200)
-
-    def test_update_view_fails_with_file(self) -> None:
-        """Verifies the update view will raise a 400 error when valid data and a new file is provided."""
-        audio = blend_audio()
-        data = self.data
-        data["file"] = self.file
-        request = self.request_factory.put("", data=data, format="json")
-        update_view = self.view_set.as_view({"put": "update"})
-        response = update_view(request, id=audio.id)
-        self.assertEquals(response.status_code, 400)
-
-    def test_partial_update_view(self) -> None:
-        """Verifies the partial update view returns a 200 when valid data and no file is provided."""
-        audio = blend_audio()
-        request = self.request_factory.patch("", data=self.data, format="json")
-        update_view = self.view_set.as_view({"patch": "partial_update"})
-        response = update_view(request, id=audio.id)
-        self.assertEquals(response.status_code, 200)
-
-    def test_partial_update_fails_with_file(self):
-        """Verifies the partial_update view will raise a 400 error when valid data and a new file is provided."""
-        audio = blend_audio()
-        data = self.data
-        data["file"] = self.file
-        request = self.request_factory.put("", data=data, format="json")
-        update_view = self.view_set.as_view({"put": "partial_update"})
-        response = update_view(request, id=audio.id)
-        self.assertEquals(response.status_code, 400)
-
-    def test_delete_view(self) -> None:
-        """Verifies the delete view returns 204 when provided a valid id."""
-        audio = blend_audio()
-        request = self.request_factory.delete("")
-        update_view = self.view_set.as_view({"delete": "destroy"})
-        response = update_view(request, id=audio.id)
-        self.assertEquals(response.status_code, 204)
-
-    def test_list_view(self) -> None:
-        """Verifies the AudioViewSet's list view data contains only public audio and returns a 200."""
-        blend_audio(10)
-        make_public(blend_audio(10))
-        request = self.request_factory.get("")
-        list_view = self.view_set.as_view({"get": "list"})
-        response = list_view(request)
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(len(response.data), 10)
+        self.assertEquals(response.data.get("code"), "file_not_provided", msg="A missing file should return a "
+                                                                              "'file_not_found' error message.")
 
 
-def blend_stream(count=1):
+def blend_stream(count
+                 =1):
     """
     A helper method for creating streams.
     :param count: The number of streams to blend.
@@ -179,7 +114,7 @@ class TestStreamViewSet(TestCase):
     def setUp(self) -> None:
         self.view_set = StreamViewSet
         self.request_factory = APIRequestFactory()
-        self.file = TEST_FILE
+        self.file = TEST_FILE_BYTES
         self.data = {
             "format": "ogg",
             "bit_rate": 192000,
@@ -206,7 +141,7 @@ class TestStreamViewSet(TestCase):
         """Verifies the detail view creates new Audio through a PUT request."""
         data = self.data
         data["audio"] = blend_audio().get_absolute_url()
-        data["file"] = self.file
+        data["file"] = self.file.read()
         request = self.request_factory.put("", data=data, format="multipart")
         update_view = self.view_set.as_view({"put": "create"})
         response = update_view(request)
