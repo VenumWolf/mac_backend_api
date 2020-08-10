@@ -92,3 +92,19 @@ class AudioSerializer(serializers.ModelSerializer):
         if "file" in validated_data.keys():
             validated_data.pop("file")
         return super().create(validated_data)
+
+    def validate(self, data):
+        """
+        Insert a file check then call the parent validate() method.
+
+        Using this method because validate_file() is only called if the file is not None.
+        """
+        file = data.get("file", None)
+        if self.is_creating_instance() and file is None:
+            raise serializers.ValidationError("A file is required when creating new Audio instances")
+        if not self.is_creating_instance() and file is not None:
+            raise serializers.ValidationError("A file should only be provided when creating new Audio instances")
+        return super(AudioSerializer, self).validate(data)
+
+    def is_creating_instance(self) -> bool:
+        return self.instance is None
