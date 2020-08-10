@@ -14,8 +14,10 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
+
 from io import BytesIO
 
+from django.core.files.temp import NamedTemporaryFile
 from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.test import TestCase
 from mixer.backend.django import mixer
@@ -24,11 +26,11 @@ from rest_framework.test import APIRequestFactory
 from mac_backend_api.audio.api.views import AudioViewSet, StreamViewSet
 from mac_backend_api.audio.models import Audio, Stream
 
-TEST_FILE_BYTES = BytesIO(b"contents")
+TEST_FILE_BYTES = BytesIO(b"test_content")
 TEST_FILE_BYTES.name = "test.ogg"
 TEST_FILE = TemporaryUploadedFile(name=TEST_FILE_BYTES.name, size=len(TEST_FILE_BYTES.read()), charset=None,
                                   content_type="audio/ogg")
-TEST_FILE.file = TEST_FILE_BYTES.read()
+TEST_FILE.file = NamedTemporaryFile()
 
 
 def blend_audio(count=1):
