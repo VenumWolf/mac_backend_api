@@ -21,6 +21,7 @@ from rest_framework.test import APIRequestFactory
 
 from mac_backend_api.audio.api.serializers import AudioSerializer, StreamSerializer, NestedStreamSerializer
 from mac_backend_api.audio.models import Audio, Stream
+from mac_backend_api.audio.tests.test_views import TEST_FILE
 
 
 class TestAudioSerializer(TestCase):
@@ -31,8 +32,23 @@ class TestAudioSerializer(TestCase):
         self.serialized_audio = AudioSerializer(self.audio, context={"request": self.request})
 
     def test_fields(self) -> None:
-        assert list(self.serialized_audio.data.keys()) == ["id", "title", "slug", "url", "description", "listen_count",
+        assert list(self.serialized_audio.data.keys()) == ["id", "title", "url", "description", "listen_count",
                                                            "uploaded_at", "is_public", "authors", "streams"]
+
+    def test_stream_creation(self) -> None:
+        """Verifies the required streams are created."""
+        serializer = AudioSerializer(data={
+            "title": "test",
+            "description": "test",
+            "is_public": True,
+            "file": TEST_FILE
+        })
+        serializer.is_valid()
+        audio = serializer.save()
+        self.assertEquals(len(audio.streams.all()), 3, msg="There should be 3 streams associated with the Audio")
+        self.assertEquals(len(audio.streams.filter(bit_rate=Stream.AudioBitRate.HIGH)), 1)
+        self.assertEquals(len(audio.streams.filter(bit_rate=Stream.AudioBitRate.AVERAGE)), 1)
+        self.assertEquals(len(audio.streams.filter(bit_rate=Stream.AudioBitRate.LOW)), 1)
 
 
 class TestStreamSerializer(TestCase):

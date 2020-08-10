@@ -14,15 +14,23 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
+
 from io import BytesIO
 
+from django.core.files.temp import NamedTemporaryFile
+from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.test import TestCase
 from mixer.backend.django import mixer
 from rest_framework.test import APIRequestFactory
 
-from mac_backend_api.audio.api.serializers import AudioSerializer
 from mac_backend_api.audio.api.views import AudioViewSet, StreamViewSet
 from mac_backend_api.audio.models import Audio, Stream
+
+TEST_FILE_BYTES = BytesIO(b"test_content")
+TEST_FILE_BYTES.name = "test.ogg"
+TEST_FILE = TemporaryUploadedFile(name=TEST_FILE_BYTES.name, size=len(TEST_FILE_BYTES.read()), charset=None,
+                                  content_type="audio/ogg")
+TEST_FILE.file = NamedTemporaryFile()
 
 
 def blend_audio(count=1):
@@ -64,66 +72,43 @@ class TestAudioViewSet(TestCase):
     def setUp(self) -> None:
         self.view_set = AudioViewSet
         self.request_factory = APIRequestFactory()
+        self.file = TEST_FILE_BYTES
         self.data = {
             "title": "Hello, world!",
             "description": "This is a test."
         }
 
-    def test_get_detail_view(self) -> None:
-        """Verifies the AudioViewSet's detail view returns with status code 200 when provided a valid id."""
+    def test_create_view(self) -> None:
+        """Verify the create view returns a 201 when provided a file and valid data."""
+        view = self.view_set.as_view({"post": "create"})
+        request = self.request_factory.post("", data=self.data, format="multipart")
+        request.FILES["file"] = TEST_FILE
+        response = view(request)
+        self.assertEquals(response.status_code, 201, response.data)
+
+    def test_create_view_without_file(self) -> None:
+        """Verify the create view returns a 400 with a 'file_not_provided' error message when a file is not provided."""
+        view = self.view_set.as_view({"post": "create"})
+        request = self.request_factory.post("", data=self.data, format="json")
+        response = view(request)
+        self.assertEquals(response.status_code, 400)
+
+    def test_update_view(self) -> None:
+        """Verify the update view returns a 200 when provided valid data"""
         audio = blend_audio()
-        request = self.request_factory.get("")
-        audio_detail_view = self.view_set.as_view({"get": "retrieve"})
-        response = audio_detail_view(request, id=audio.id)
-        self.assertEquals(response.status_code, 200)
-
-    def test_get_detail_view_invalid_id(self) -> None:
-        """Verifies the AudioViewSet's detail view returns a 404 when provided an invalid id."""
-        request = self.request_factory.get("")
-        audio_detail_view = self.view_set.as_view({"get": "retrieve"})
-        response = audio_detail_view(request, id="invalid")
-        self.assertEquals(response.status_code, 404)
-
-    def test_put_detail_view_new_audio(self) -> None:
-        """Verifies the AudioViewSet's detail view creates new Audio through a put request."""
+        view = self.view_set .as_view({"put": "update"})
         request = self.request_factory.put("", data=self.data, format="json")
-        update_view = self.view_set.as_view({"put": "create"})
-        response = update_view(request)
-        self.assertEquals(response.status_code, 201)
-
-    def test_put_detail_view_existing_audio(self) -> None:
-        """Verifies the AudioViewSet's detail view updates existing Audio with a put request."""
-        audio = blend_audio()
-        request = self.request_factory.put("", data=self.data, format="json")
-        update_view = self.view_set.as_view({"put": "update"})
-        response = update_view(request, id=audio.id)
+        response = view(request, id=audio.id)
         self.assertEquals(response.status_code, 200)
 
-    def test_patch_detail_view(self) -> None:
-        """Verifies the AudioViewSet's detail view updates existing Audio with a patch request."""
+    def test_update_view_with_file(self) -> None:
+        """Verify the update view returns a 400 when a file is provided."""
         audio = blend_audio()
-        request = self.request_factory.patch("", data=self.data, format="json")
-        update_view = self.view_set.as_view({"patch": "partial_update"})
-        response = update_view(request, id=audio.id)
-        self.assertEquals(response.status_code, 200)
-
-    def test_delete_detail_view(self) -> None:
-        """Verifies the AudioViewSet's detail view delete's existing audio with a delete request."""
-        audio = blend_audio()
-        request = self.request_factory.delete("")
-        update_view = self.view_set.as_view({"delete": "destroy"})
-        response = update_view(request, id=audio.id)
-        self.assertEquals(response.status_code, 204)
-
-    def test_get_list_view(self) -> None:
-        """Verifies the AudioViewSet's list view data contains only public audio."""
-        blend_audio(10)
-        make_public(blend_audio(10))
-        request = self.request_factory.get("")
-        list_view = self.view_set.as_view({"get": "list"})
-        response = list_view(request)
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(len(response.data), 10)
+        view = self.view_set.as_view({"post": "update"})
+        request = self.request_factory.post("", data=self.data, format="multipart")
+        request.FILES["file"] = TEST_FILE
+        response = view(request, id=audio.id)
+        self.assertEquals(response.status_code, 400)
 
 
 def blend_stream(count=1):
@@ -147,8 +132,7 @@ class TestStreamViewSet(TestCase):
     def setUp(self) -> None:
         self.view_set = StreamViewSet
         self.request_factory = APIRequestFactory()
-        self.file = BytesIO(b"contents")
-        self.file.name = "test_file.ogg"
+        self.file = TEST_FILE_BYTES
         self.data = {
             "format": "ogg",
             "bit_rate": 192000,
@@ -175,7 +159,7 @@ class TestStreamViewSet(TestCase):
         """Verifies the detail view creates new Audio through a PUT request."""
         data = self.data
         data["audio"] = blend_audio().get_absolute_url()
-        data["file"] = self.file
+        data["file"] = self.file.read()
         request = self.request_factory.put("", data=data, format="multipart")
         update_view = self.view_set.as_view({"put": "create"})
         response = update_view(request)
