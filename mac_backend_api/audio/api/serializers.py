@@ -55,6 +55,25 @@ class NestedStreamSerializer(serializers.ModelSerializer):
         }
 
 
+DEFAULT_STREAM_PRESETS = (
+    {
+        "format": Stream.AudioFormat.OGG,
+        "sample_rate": Stream.AudioSampleRate.HIGH,
+        "bit_rate": Stream.AudioBitRate.HIGH
+    },
+    {
+        "format": Stream.AudioFormat.OGG,
+        "sample_rate": Stream.AudioSampleRate.AVERAGE,
+        "bit_rate": Stream.AudioBitRate.AVERAGE
+    },
+    {
+        "format": Stream.AudioFormat.OGG,
+        "sample_rate": Stream.AudioSampleRate.LOW,
+        "bit_rate": Stream.AudioBitRate.LOW
+    }
+)
+
+
 class AudioSerializer(serializers.ModelSerializer):
     streams = NestedStreamSerializer(
         many=True,
@@ -87,11 +106,43 @@ class AudioSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """
-        Removes the file field from the data before attempting to create the Audio instance.
+        Strips the "file" field, calls
         """
-        if "file" in validated_data.keys():
-            validated_data.pop("file")
-        return super().create(validated_data)
+        audio_file = self.pop_file(validated_data)
+        audio = super().create(validated_data)
+        self.create_default_streams(audio, audio_file)
+        return audio
+
+    def pop_file(self, data):
+        """
+        Pop the file field from the data if it is present.
+        :param data: The validated data to pop from
+        :return:     The file, or None if the file was not provided.
+        """
+        if "file" in data.keys():
+            file = data.pop("file")
+        else:
+            file = None
+        return file
+
+    def create_default_streams(self, audio, audio_file, presets=DEFAULT_STREAM_PRESETS):
+        """
+        Create the default streams for the Audio.
+        :param audio:      The Audio instance to create
+        :param audio_file: A file-like object containing the uploaded audio data.
+        :param presets:    A list of dictionaries containing the 'format', 'sample_rate', and 'bit_rate' of the
+                           streams to create.  A stream will be created for each entry in the list using the settings
+                           provided by the entry.
+        """
+        for preset in presets:
+            stream = Stream(
+                audio=audio,
+                format=preset.get("format"),
+                sample_rate=preset.get("sample_rate"),
+                bit_rate=preset.get("bit_rate"),
+                file=audio_file
+            )
+            stream.save()
 
     def validate(self, data):
         """
