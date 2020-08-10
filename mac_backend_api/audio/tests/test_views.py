@@ -17,7 +17,6 @@
 
 from io import BytesIO
 
-from django.core.files.temp import NamedTemporaryFile
 from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.test import TestCase
 from mixer.backend.django import mixer
@@ -30,8 +29,6 @@ TEST_FILE_BYTES = BytesIO(b"test_content")
 TEST_FILE_BYTES.name = "test.ogg"
 TEST_FILE = TemporaryUploadedFile(name=TEST_FILE_BYTES.name, size=len(TEST_FILE_BYTES.read()), charset=None,
                                   content_type="audio/ogg")
-TEST_FILE.file = NamedTemporaryFile()
-
 
 def blend_audio(count=1):
     """
