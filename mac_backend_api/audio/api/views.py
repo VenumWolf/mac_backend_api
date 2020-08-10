@@ -16,15 +16,13 @@
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
 from rest_framework import status
-from rest_framework.decorators import parser_classes
 from rest_framework.exceptions import ErrorDetail
-from rest_framework.parsers import MultiPartParser, FileUploadParser, JSONParser, FormParser
+from rest_framework.parsers import MultiPartParser, JSONParser, FormParser
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from mac_backend_api.audio.api.serializers import AudioSerializer, StreamSerializer
 from mac_backend_api.audio.models import Audio, Stream
-
 
 ERROR_DATA = {
     "file_not_provided": {
