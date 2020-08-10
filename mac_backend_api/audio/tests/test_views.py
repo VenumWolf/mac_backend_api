@@ -87,7 +87,7 @@ class TestAudioViewSet(TestCase):
     def test_create_view_without_file(self) -> None:
         """Verify the create view returns a 400 with a 'file_not_provided' error message when a file is not provided."""
         view = self.view_set.as_view({"post": "create"})
-        request = self.request_factory.post("", data=self.data, format="multipart")
+        request = self.request_factory.post("", data=self.data, format="json")
         response = view(request)
         self.assertEquals(response.status_code, 400)
         self.assertEquals(response.data.get("code"), "file_not_provided", msg="A missing file should return a "
