@@ -17,7 +17,7 @@
 
 from io import BytesIO
 
-from django.core.files.uploadedfile import TemporaryUploadedFile
+from django.core.files.uploadedfile import TemporaryUploadedFile, InMemoryUploadedFile
 from django.test import TestCase
 from mixer.backend.django import mixer
 from rest_framework.test import APIRequestFactory
@@ -25,10 +25,10 @@ from rest_framework.test import APIRequestFactory
 from mac_backend_api.audio.api.views import AudioViewSet, StreamViewSet
 from mac_backend_api.audio.models import Audio, Stream
 
-TEST_FILE_BYTES = BytesIO(b"test_content")
-TEST_FILE_BYTES.name = "test.ogg"
-TEST_FILE = TemporaryUploadedFile(name=TEST_FILE_BYTES.name, size=len(TEST_FILE_BYTES.read()), charset=None,
-                                  content_type="audio/ogg")
+TEST_FILE_BYTES = BytesIO(b'content')
+TEST_FILE = InMemoryUploadedFile(file=TEST_FILE_BYTES, field_name="file", name="uploaded",
+                                 size=len(TEST_FILE_BYTES.read()), charset=None, content_type="audio/ogg")
+
 
 def blend_audio(count=1):
     """
