@@ -22,6 +22,7 @@ from django.contrib.auth.models import Permission
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.test import TestCase
 from mixer.backend.django import mixer
+from rest_framework.response import Response
 from rest_framework.test import APIRequestFactory
 
 from mac_backend_api.audio.api.views import AudioViewSet, StreamViewSet
@@ -97,63 +98,101 @@ class TestAudioViewSet(TestCase):
 
     def test_list_view(self) -> None:
         """Verify the list view returns a 200 for unauthenticated users."""
-        view = self.view_set.as_view({"get": "list"})
-        request = self.request_factory.get("")
-        response = view(request)
+        response = self.make_get_request(view_name="list")
         self.assertEquals(response.status_code, 200, msg=response.data)
 
     def test_retrieve_view(self) -> None:
         """Verify the retrieve view returns a 200 for unauthenticated users when provided a valid id."""
-        audio = blend_audio()
-        view = self.view_set.as_view({"get": "retrieve"})
-        request = self.request_factory.get("")
-        response = view(request, id=audio.id)
+        response = self.make_get_request(view_name="retrieve", audio=blend_audio())
         self.assertEquals(response.status_code, 200, msg=response.data)
+
+    def make_get_request(self, view_name, audio=None, user=None) -> Response:
+        """
+        Make a get request to the specified view and return its response.
+        :param view_name: The view to which to make the request.
+        :param audio:     The audio to request if any.  Default is None.
+        :param user:      The user making the request if any.  Default is None.
+        :return:          The Response from the view.
+        """
+        view = self.view_set.as_view({"get": view_name})
+        request = self.request_factory.get("")
+        if user is not None:
+            request.user = user
+        if audio is not None:
+            response = view(request, id=audio.id)
+        else:
+            response = view(request)
+        return response
 
     def test_create_view(self) -> None:
         """Verify the create view returns a 201 when provided a file and valid data."""
-        view = self.view_set.as_view({"post": "create"})
-        request = self.request_factory.post("", data=self.data, format="multipart")
-        request.user = blend_user("Can add audio")
-        request.FILES["file"] = TEST_FILE
-        response = view(request)
+        response = self.make_create_request(audio_file=TEST_FILE, user=blend_user("Can add audio"))
         self.assertEquals(response.status_code, 201, msg=response.data)
 
     def test_create_view_without_file(self) -> None:
         """Verify the create view returns a 400 with a 'file_not_provided' error message when a file is not provided."""
-        view = self.view_set.as_view({"post": "create"})
-        request = self.request_factory.post("", data=self.data, format="json")
-        request.user = blend_user("Can add audio")
-        response = view(request)
+        response = self.make_create_request(user=blend_user("Can add audio"))
         self.assertEquals(response.status_code, 400, msg=response.data)
+
+    def make_create_request(self, audio_file=None, user=None) -> Response:
+        """
+        Make a request to the create view and return its response.
+        :param audio_file: The audio file to attach with the request if any.  Default is None
+        :param user:       The user making the request if any.  Default is None.
+        :return:           The Response from the view.
+        """
+        view = self.view_set.as_view({"post": "create"})
+        request = self.request_factory.post("", data=self.data, format="multipart")
+        if audio_file is not None:
+            request.FILES["file"] = TEST_FILE
+        if user is not None:
+            request.user = user
+        return view(request)
 
     def test_update_view(self) -> None:
         """Verify the update view returns a 200 when provided valid data"""
-        audio = blend_audio()
-        view = self.view_set .as_view({"put": "update"})
-        request = self.request_factory.put("", data=self.data, format="json")
-        request.user = blend_user("Can change audio")
-        response = view(request, id=audio.id)
+        response = self.make_update_request(audio=blend_audio(), user=blend_user("Can change audio"))
         self.assertEquals(response.status_code, 200, msg=response.data)
 
     def test_update_view_with_file(self) -> None:
         """Verify the update view returns a 400 when a file is provided."""
-        audio = blend_audio()
-        view = self.view_set.as_view({"post": "update"})
-        request = self.request_factory.post("", data=self.data, format="multipart")
-        request.user = blend_user("Can change audio")
-        request.FILES["file"] = TEST_FILE
-        response = view(request, id=audio.id)
+        response = self.make_update_request(audio=blend_audio(), audio_file=TEST_FILE,
+                                            user=blend_user("Can change audio"))
         self.assertEquals(response.status_code, 400, msg=response.data)
 
+    def make_update_request(self, audio, audio_file=None, user=None) -> Response:
+        """
+        Make a request to the update view and return its response.
+        :param audio:      The audio to update.
+        :param audio_file: An audio file to attach with the request if any.  Default is None.
+        :param user:       The user making the request if any.  Default is None.
+        :return:           The Response from the view.
+        """
+        view = self.view_set.as_view({"post": "update"})
+        request = self.request_factory.post("", data=self.data, format="multipart")
+        if user is not None:
+            request.user = user
+        if audio_file is not None:
+            request.FILES["file"] = audio_file
+        return view(request, id=audio.id)
+
     def test_destroy_view(self) -> None:
-        """Verify the destroy view returns a 204 when a valid id is provided."""
-        audio = blend_audio()
+        """Verify the destroy view returns a 204 when a valid id is provided, and user has "delete_audio" permission."""
+        response = self.make_delete_request(blend_audio(), blend_user("Can delete audio"))
+        self.assertEquals(response.status_code, 204, msg=response.data)
+
+    def make_delete_request(self, audio, user=None) -> Response:
+        """
+        Make a delete request to the destroy view and return its response.
+        :param audio: The audio to delete.
+        :param user:  The user making the request if any.  Default is None.
+        :return:      The Response from the view.
+        """
         view = self.view_set.as_view({"delete": "destroy"})
         request = self.request_factory.delete("")
-        request.user = blend_user("Can delete audio")
-        response = view(request, id=audio.id)
-        self.assertEquals(response.status_code, 204, msg=response.data)
+        if user is not None:
+            request.user = user
+        return view(request, id=audio.id)
 
 
 def blend_stream(count=1):
