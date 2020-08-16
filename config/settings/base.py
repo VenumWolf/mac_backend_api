@@ -114,6 +114,9 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
+        # NOTE:
+        # Views may assume they are read only to unauthenticated users by default.  Take care when removing or modifying
+        # this value.
         'rest_framework.permissions.IsAuthenticatedOrReadOnly'
     ],
     'DATETIME_FORMAT': DATETIME_FORMAT
