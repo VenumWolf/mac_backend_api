@@ -214,6 +214,24 @@ class TestAudioViewSet(TestCase):
         response = self.make_delete_request(blend_audio())
         self.assertEquals(response.status_code, 401, msg=response.data)
 
+    def test_destroy_view_delete_own_permission_with_others_audio(self) -> None:
+        """
+        Verify the destroy view returns a 401 when the user has "audio_destroy_own" permission but does not own the
+        audio.
+        """
+        response = self.make_delete_request(audio=blend_audio(), user=blend_user("Can delete own audio"))
+        self.assertEquals(response.status_code, 401, msg=response.data)
+
+    def test_destroy_view_delete_own_permission_with_owned_audio(self) -> None:
+        """
+        Verify the destroy view returns a 204 when the user has "audio_destroy_own" permission and owns the audio.
+        """
+        user = blend_user("Can delete own audio")
+        audio = blend_audio()
+        audio.authors.add(user)
+        response = self.make_delete_request(audio=audio, user=user)
+        self.assertEquals(response.status_code, 204, msg=response.data)
+
     def make_delete_request(self, audio, user=None) -> Response:
         """
         Make a delete request to the destroy view and return its response.
