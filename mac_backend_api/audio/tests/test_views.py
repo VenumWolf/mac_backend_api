@@ -19,7 +19,7 @@ from io import BytesIO
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
-from django.core.files.uploadedfile import TemporaryUploadedFile, InMemoryUploadedFile
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.test import TestCase
 from mixer.backend.django import mixer
 from rest_framework.test import APIRequestFactory
@@ -69,16 +69,19 @@ def make_public(audio) -> None:
     return audio
 
 
-def blend_user(permission=None) -> User:
+def blend_user(permission_names=None) -> User:
     """
     A helper method for creating users for testing.
-    :param permission: A permission, if any the user should have. Default is None.
-    :return:           A user with the permission if one is provided.
+    :param permission_names: A permission, if any the user should have. Default is None.  May be a String, or a List.
+    :return:                A user with the permission if one is provided.
     """
     user = mixer.blend(User)
-    if permission is not None:
-        permission = Permission.objects.get(value=permission)
-        user.permissions.add(permission)
+    if permission_names is not None:
+        if not isinstance(permission_names, list):
+            permission_names = [permission_names]
+        for permission in permission_names:
+            permission = Permission.objects.get(name=permission)
+            user.permissions.add(permission)
     return user
 
 
@@ -96,6 +99,7 @@ class TestAudioViewSet(TestCase):
         """Verify the create view returns a 201 when provided a file and valid data."""
         view = self.view_set.as_view({"post": "create"})
         request = self.request_factory.post("", data=self.data, format="multipart")
+        request.user = blend_user("Can add audio")
         request.FILES["file"] = TEST_FILE
         response = view(request)
         self.assertEquals(response.status_code, 201, response.data)
