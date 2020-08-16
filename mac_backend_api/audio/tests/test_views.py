@@ -170,7 +170,7 @@ class TestAudioViewSet(TestCase):
         response = self.make_update_request(audio=blend_audio())
         self.assertEquals(response.status_code, 401, msg=response.data)
 
-    def test_update_view_change_own_permission_with_others_audio(self):
+    def test_update_view_change_own_permission_with_others_audio(self) -> None:
         """
         Verify the update view returns a 401 when the user has "audio_change_own" permission but does not own the
         audio.
@@ -178,7 +178,7 @@ class TestAudioViewSet(TestCase):
         response = self.make_update_request(audio=blend_audio(), user=blend_user("Can change own audio"))
         self.assertEquals(response.status_code, 401, msg=response.data)
 
-    def test_update_view_change_own_permission_with_owned_audio(self):
+    def test_update_view_change_own_permission_with_owned_audio(self) -> None:
         """
         Verify the update view returns a 200 when the user has "audio_change_own" permission and owns the audio.
         """
@@ -208,6 +208,11 @@ class TestAudioViewSet(TestCase):
         """Verify the destroy view returns a 204 when a valid id is provided, and user has "delete_audio" permission."""
         response = self.make_delete_request(blend_audio(), blend_user("Can delete audio"))
         self.assertEquals(response.status_code, 204, msg=response.data)
+
+    def test_destroy_view_no_permission(self) -> None:
+        """Verify the destroy view returns a 401 when the user does not have permission or is unauthenticated."""
+        response = self.make_delete_request(blend_audio())
+        self.assertEquals(response.status_code, 401, msg=response.data)
 
     def make_delete_request(self, audio, user=None) -> Response:
         """
