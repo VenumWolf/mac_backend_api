@@ -147,6 +147,7 @@ class TestAudioViewSet(TestCase):
         self.assertEquals(response.status_code, 400)
 
     def test_destroy_view(self) -> None:
+        """Verify the destroy view returns a 204 when a valid id is provided."""
         audio = blend_audio()
         view = self.view_set.as_view({"delete": "destroy"})
         request = self.request_factory.delete("")
