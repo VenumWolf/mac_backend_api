@@ -136,9 +136,9 @@ class TestAudioViewSet(TestCase):
         self.assertEquals(response.status_code, 400, msg=response.data)
 
     def test_create_view_no_permission(self) -> None:
-        """Verify the create view returns a 401 when the user is missing permissions."""
+        """Verify the create view returns a 403 when the user is missing permissions."""
         response = self.make_create_request(audio_file=TEST_FILE, user=blend_user())
-        self.assertEquals(response.status_code, 401, msg=response.data)
+        self.assertEquals(response.status_code, 403, msg=response.data)
 
     def test_create_view_no_user(self) -> None:
         """Verify the create view returns a 401 when user is unauthenticated."""
@@ -166,16 +166,10 @@ class TestAudioViewSet(TestCase):
         response = self.make_update_request(audio=blend_audio(), user=blend_user("Can change audio"))
         self.assertEquals(response.status_code, 200, msg=response.data)
 
-    def test_update_view_with_file(self) -> None:
-        """Verify the update view returns a 400 when a file is provided."""
-        response = self.make_update_request(audio=blend_audio(), audio_file=TEST_FILE,
-                                            user=blend_user("Can change audio"))
-        self.assertEquals(response.status_code, 400, msg=response.data)
-
     def test_update_view_no_permission(self) -> None:
-        """Verify the update view returns a 401 when the user is missing permissions."""
+        """Verify the update view returns a 403 when the user is missing permissions."""
         response = self.make_update_request(audio=blend_audio(), user=blend_user())
-        self.assertEquals(response.status_code, 401, msg=response.data)
+        self.assertEquals(response.status_code, 403, msg=response.data)
 
     def test_update_view_no_user(self) -> None:
         """Verify the update view returns a 401 when the user is unauthenticated."""
@@ -184,11 +178,11 @@ class TestAudioViewSet(TestCase):
 
     def test_update_view_change_others_audio(self) -> None:
         """
-        Verify the update view returns a 401 when the user has "change_audio" permission but does not own the
+        Verify the update view returns a 403 when the user has "change_audio" permission but does not own the
         audio.
         """
         response = self.make_update_request(audio=blend_audio(), user=blend_user("Can change audio"))
-        self.assertEquals(response.status_code, 401, msg=response.data)
+        self.assertEquals(response.status_code, 403, msg=response.data)
 
     def test_update_view_change_own_audio(self) -> None:
         """
@@ -200,7 +194,7 @@ class TestAudioViewSet(TestCase):
         response = self.make_update_request(audio=audio, user=user)
         self.assertEquals(response.status_code, 200, msg=response.data)
 
-    def make_update_request(self, audio, audio_file=None, user=None) -> Response:
+    def make_update_request(self, audio, user=None) -> Response:
         """
         Make a request to the update view and return its response.
         :param audio:      The audio to update.
@@ -208,13 +202,11 @@ class TestAudioViewSet(TestCase):
         :param user:       The user making the request if any.  Default is None.
         :return:           The Response from the view.
         """
-        view = self.view_set.as_view({"post": "update"})
-        request = self.request_factory.post("", data=self.data, format="multipart")
+        view = self.view_set.as_view({"put": "update"})
+        request = self.request_factory.put("", data=self.data, format="json")
         if user is not None:
             force_authenticate(request, user)
             request.user = user
-        if audio_file is not None:
-            request.FILES["file"] = audio_file
         return view(request, id=audio.id)
 
     def test_destroy_view(self) -> None:
@@ -223,9 +215,9 @@ class TestAudioViewSet(TestCase):
         self.assertEquals(response.status_code, 204, msg=response.data)
 
     def test_destroy_view_no_permission(self) -> None:
-        """Verify the destroy view returns a 401 when the user is missing permissions."""
+        """Verify the destroy view returns a 403 when the user is missing permissions."""
         response = self.make_delete_request(audio=blend_audio(), user=blend_user())
-        self.assertEquals(response.status_code, 401, msg=response.data)
+        self.assertEquals(response.status_code, 403, msg=response.data)
 
     def test_destroy_view_no_user(self) -> None:
         """Verify the destroy view returns a 401 when the user is unauthenticated."""
@@ -234,11 +226,11 @@ class TestAudioViewSet(TestCase):
 
     def test_destroy_view_delete_others_audio(self) -> None:
         """
-        Verify the destroy view returns a 401 when the user has "audio_destroy" permission but does not own the
+        Verify the destroy view returns a 403 when the user has "audio_destroy" permission but does not own the
         audio.
         """
         response = self.make_delete_request(audio=blend_audio(), user=blend_user("Can delete audio"))
-        self.assertEquals(response.status_code, 401, msg=response.data)
+        self.assertEquals(response.status_code, 403, msg=response.data)
 
     def test_destroy_view_delete_own_audio(self) -> None:
         """
