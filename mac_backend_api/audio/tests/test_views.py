@@ -136,8 +136,13 @@ class TestAudioViewSet(TestCase):
         self.assertEquals(response.status_code, 400, msg=response.data)
 
     def test_create_view_no_permission(self) -> None:
-        """Verify the create view returns a 401 when the user does not have "create_audio" permission."""
+        """Verify the create view returns a 401 when the user is missing permissions."""
         response = self.make_create_request(audio_file=TEST_FILE, user=blend_user())
+        self.assertEquals(response.status_code, 401, msg=response.data)
+
+    def test_create_view_no_user(self) -> None:
+        """Verify the create view returns a 401 when user is unauthenticated."""
+        response = self.make_create_request(audio_file=TEST_FILE)
         self.assertEquals(response.status_code, 401, msg=response.data)
 
     def make_create_request(self, audio_file=None, user=None) -> Response:
@@ -168,8 +173,13 @@ class TestAudioViewSet(TestCase):
         self.assertEquals(response.status_code, 400, msg=response.data)
 
     def test_update_view_no_permission(self) -> None:
-        """Verify the update view returns a 401 when the user is missing permission or is unauthenticated."""
+        """Verify the update view returns a 401 when the user is missing permissions."""
         response = self.make_update_request(audio=blend_audio(), user=blend_user())
+        self.assertEquals(response.status_code, 401, msg=response.data)
+
+    def test_update_view_no_user(self) -> None:
+        """Verify the update view returns a 401 when the user is unauthenticated."""
+        response = self.make_update_request(audio=blend_audio())
         self.assertEquals(response.status_code, 401, msg=response.data)
 
     def test_update_view_change_own_permission_with_others_audio(self) -> None:
@@ -213,8 +223,13 @@ class TestAudioViewSet(TestCase):
         self.assertEquals(response.status_code, 204, msg=response.data)
 
     def test_destroy_view_no_permission(self) -> None:
-        """Verify the destroy view returns a 401 when the user does not have permission or is unauthenticated."""
-        response = self.make_delete_request(blend_audio(), blend_user())
+        """Verify the destroy view returns a 401 when the user is missing permissions."""
+        response = self.make_delete_request(audio=blend_audio(), user=blend_user())
+        self.assertEquals(response.status_code, 401, msg=response.data)
+
+    def test_destroy_view_no_user(self) -> None:
+        """Verify the destroy view returns a 401 when the user is unauthenticated."""
+        response = self.make_delete_request(audio=blend_audio())
         self.assertEquals(response.status_code, 401, msg=response.data)
 
     def test_destroy_view_delete_own_permission_with_others_audio(self) -> None:
