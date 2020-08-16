@@ -23,7 +23,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.test import TestCase
 from mixer.backend.django import mixer
 from rest_framework.response import Response
-from rest_framework.test import APIRequestFactory
+from rest_framework.test import APIRequestFactory, force_authenticate
 
 from mac_backend_api.audio.api.views import AudioViewSet, StreamViewSet
 from mac_backend_api.audio.models import Audio, Stream
@@ -117,6 +117,7 @@ class TestAudioViewSet(TestCase):
         view = self.view_set.as_view({"get": view_name})
         request = self.request_factory.get("")
         if user is not None:
+            force_authenticate(request, user)
             request.user = user
         if audio is not None:
             response = view(request, id=audio.id)
@@ -151,6 +152,7 @@ class TestAudioViewSet(TestCase):
         if audio_file is not None:
             request.FILES["file"] = TEST_FILE
         if user is not None:
+            force_authenticate(request, user)
             request.user = user
         return view(request)
 
@@ -199,6 +201,7 @@ class TestAudioViewSet(TestCase):
         view = self.view_set.as_view({"post": "update"})
         request = self.request_factory.post("", data=self.data, format="multipart")
         if user is not None:
+            force_authenticate(request, user)
             request.user = user
         if audio_file is not None:
             request.FILES["file"] = audio_file
@@ -242,6 +245,7 @@ class TestAudioViewSet(TestCase):
         view = self.view_set.as_view({"delete": "destroy"})
         request = self.request_factory.delete("")
         if user is not None:
+            force_authenticate(request, user)
             request.user = user
         return view(request, id=audio.id)
 
