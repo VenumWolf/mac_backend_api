@@ -95,6 +95,21 @@ class TestAudioViewSet(TestCase):
             "description": "This is a test."
         }
 
+    def test_list_view(self) -> None:
+        """Verify the list view returns a 200 for unauthenticated users."""
+        view = self.view_set.as_view({"get": "list"})
+        request = self.request_factory.get("")
+        response = view(request)
+        self.assertEquals(response.status_code, 200, response.data)
+
+    def test_retrieve_view(self) -> None:
+        """Verify the retrieve view returns a 200 for unauthenticated users when provided a valid id."""
+        audio = blend_audio()
+        view = self.view_set.as_view({"get": "retrieve"})
+        request = self.request_factory.get("")
+        response = view(request, id=audio.id)
+        self.assertEquals(response.status_code, 200, response.data)
+
     def test_create_view(self) -> None:
         """Verify the create view returns a 201 when provided a file and valid data."""
         view = self.view_set.as_view({"post": "create"})
@@ -130,7 +145,6 @@ class TestAudioViewSet(TestCase):
         request.FILES["file"] = TEST_FILE
         response = view(request, id=audio.id)
         self.assertEquals(response.status_code, 400)
-
 
 
 def blend_stream(count=1):
