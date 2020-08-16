@@ -134,6 +134,11 @@ class TestAudioViewSet(TestCase):
         response = self.make_create_request(user=blend_user("Can add audio"))
         self.assertEquals(response.status_code, 400, msg=response.data)
 
+    def test_create_view_no_permission(self) -> None:
+        """Verify the create view returns a 401 when the user does not have "create_audio" permission."""
+        response = self.make_create_request(audio_file=TEST_FILE)
+        self.assertEquals(response.status_code, 401, msg=response.data)
+
     def make_create_request(self, audio_file=None, user=None) -> Response:
         """
         Make a request to the create view and return its response.
