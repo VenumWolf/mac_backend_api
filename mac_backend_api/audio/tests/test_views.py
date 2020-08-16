@@ -100,7 +100,7 @@ class TestAudioViewSet(TestCase):
         view = self.view_set.as_view({"get": "list"})
         request = self.request_factory.get("")
         response = view(request)
-        self.assertEquals(response.status_code, 200, response.data)
+        self.assertEquals(response.status_code, 200, msg=response.data)
 
     def test_retrieve_view(self) -> None:
         """Verify the retrieve view returns a 200 for unauthenticated users when provided a valid id."""
@@ -108,7 +108,7 @@ class TestAudioViewSet(TestCase):
         view = self.view_set.as_view({"get": "retrieve"})
         request = self.request_factory.get("")
         response = view(request, id=audio.id)
-        self.assertEquals(response.status_code, 200, response.data)
+        self.assertEquals(response.status_code, 200, msg=response.data)
 
     def test_create_view(self) -> None:
         """Verify the create view returns a 201 when provided a file and valid data."""
@@ -117,7 +117,7 @@ class TestAudioViewSet(TestCase):
         request.user = blend_user("Can add audio")
         request.FILES["file"] = TEST_FILE
         response = view(request)
-        self.assertEquals(response.status_code, 201, response.data)
+        self.assertEquals(response.status_code, 201, msg=response.data)
 
     def test_create_view_without_file(self) -> None:
         """Verify the create view returns a 400 with a 'file_not_provided' error message when a file is not provided."""
@@ -125,7 +125,7 @@ class TestAudioViewSet(TestCase):
         request = self.request_factory.post("", data=self.data, format="json")
         request.user = blend_user("Can add audio")
         response = view(request)
-        self.assertEquals(response.status_code, 400)
+        self.assertEquals(response.status_code, 400, msg=response.data)
 
     def test_update_view(self) -> None:
         """Verify the update view returns a 200 when provided valid data"""
@@ -134,7 +134,7 @@ class TestAudioViewSet(TestCase):
         request = self.request_factory.put("", data=self.data, format="json")
         request.user = blend_user("Can change audio")
         response = view(request, id=audio.id)
-        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.status_code, 200, msg=response.data)
 
     def test_update_view_with_file(self) -> None:
         """Verify the update view returns a 400 when a file is provided."""
@@ -144,7 +144,7 @@ class TestAudioViewSet(TestCase):
         request.user = blend_user("Can change audio")
         request.FILES["file"] = TEST_FILE
         response = view(request, id=audio.id)
-        self.assertEquals(response.status_code, 400)
+        self.assertEquals(response.status_code, 400, msg=response.data)
 
     def test_destroy_view(self) -> None:
         """Verify the destroy view returns a 204 when a valid id is provided."""
