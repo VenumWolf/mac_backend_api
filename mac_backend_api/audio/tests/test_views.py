@@ -182,17 +182,17 @@ class TestAudioViewSet(TestCase):
         response = self.make_update_request(audio=blend_audio())
         self.assertEquals(response.status_code, 401, msg=response.data)
 
-    def test_update_view_change_own_permission_with_others_audio(self) -> None:
+    def test_update_view_change_others_audio(self) -> None:
         """
-        Verify the update view returns a 401 when the user has "audio_change_own" permission but does not own the
+        Verify the update view returns a 401 when the user has "change_audio" permission but does not own the
         audio.
         """
         response = self.make_update_request(audio=blend_audio(), user=blend_user("Can change audio"))
         self.assertEquals(response.status_code, 401, msg=response.data)
 
-    def test_update_view_change_own_permission_with_owned_audio(self) -> None:
+    def test_update_view_change_own_audio(self) -> None:
         """
-        Verify the update view returns a 200 when the user has "audio_change_own" permission and owns the audio.
+        Verify the update view returns a 200 when the user has "change_audio" permission and owns the audio.
         """
         user = blend_user("Can change audio")
         audio = blend_audio()
@@ -232,17 +232,17 @@ class TestAudioViewSet(TestCase):
         response = self.make_delete_request(audio=blend_audio())
         self.assertEquals(response.status_code, 401, msg=response.data)
 
-    def test_destroy_view_delete_own_permission_with_others_audio(self) -> None:
+    def test_destroy_view_delete_others_audio(self) -> None:
         """
-        Verify the destroy view returns a 401 when the user has "audio_destroy_own" permission but does not own the
+        Verify the destroy view returns a 401 when the user has "audio_destroy" permission but does not own the
         audio.
         """
         response = self.make_delete_request(audio=blend_audio(), user=blend_user("Can delete audio"))
         self.assertEquals(response.status_code, 401, msg=response.data)
 
-    def test_destroy_view_delete_own_permission_with_owned_audio(self) -> None:
+    def test_destroy_view_delete_own_audio(self) -> None:
         """
-        Verify the destroy view returns a 204 when the user has "audio_destroy_own" permission and owns the audio.
+        Verify the destroy view returns a 204 when the user has "destroy_audio" permission and owns the audio.
         """
         user = blend_user("Can delete audio")
         audio = blend_audio()
