@@ -178,6 +178,16 @@ class TestAudioViewSet(TestCase):
         response = self.make_update_request(audio=blend_audio(), user=blend_user("Can change own audio"))
         self.assertEquals(response.status_code, 401, msg=response.data)
 
+    def test_update_view_change_own_permission_with_owned_audio(self):
+        """
+        Verify the update view returns a 200 when the user has "audio_change_own" permission and owns the audio.
+        """
+        user = blend_user("Can change own audio")
+        audio = blend_audio()
+        audio.authors.add(user)
+        response = self.make_update_request(audio=audio, user=user)
+        self.assertEquals(response.status_code, 200, msg=response.data)
+
     def make_update_request(self, audio, audio_file=None, user=None) -> Response:
         """
         Make a request to the update view and return its response.
