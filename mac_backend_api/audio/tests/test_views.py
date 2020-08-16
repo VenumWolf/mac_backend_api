@@ -17,6 +17,8 @@
 
 from io import BytesIO
 
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.core.files.uploadedfile import TemporaryUploadedFile, InMemoryUploadedFile
 from django.test import TestCase
 from mixer.backend.django import mixer
@@ -24,6 +26,8 @@ from rest_framework.test import APIRequestFactory
 
 from mac_backend_api.audio.api.views import AudioViewSet, StreamViewSet
 from mac_backend_api.audio.models import Audio, Stream
+
+User = get_user_model()
 
 TEST_FILE_BYTES = BytesIO(b'content')
 TEST_FILE = InMemoryUploadedFile(file=TEST_FILE_BYTES, field_name="file", name="uploaded",
@@ -63,6 +67,19 @@ def make_public(audio) -> None:
     if len(audio) == 1:
         audio = audio[0]
     return audio
+
+
+def blend_user(permission=None) -> User:
+    """
+    A helper method for creating users for testing.
+    :param permission: A permission, if any the user should have. Default is None.
+    :return:           A user with the permission if one is provided.
+    """
+    user = mixer.blend(User)
+    if permission is not None:
+        permission = Permission.objects.get(value=permission)
+        user.permissions.add(permission)
+    return user
 
 
 class TestAudioViewSet(TestCase):
