@@ -146,6 +146,14 @@ class TestAudioViewSet(TestCase):
         response = view(request, id=audio.id)
         self.assertEquals(response.status_code, 400)
 
+    def test_destroy_view(self) -> None:
+        audio = blend_audio()
+        view = self.view_set.as_view({"delete": "destroy"})
+        request = self.request_factory.delete("")
+        request.user = blend_user("Can delete audio")
+        response = view(request, id=audio.id)
+        self.assertEquals(response.status_code, 204, msg=response.data)
+
 
 def blend_stream(count=1):
     """
