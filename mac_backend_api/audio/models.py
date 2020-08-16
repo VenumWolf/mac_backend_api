@@ -36,8 +36,8 @@ class Audio(models.Model):
 
     class Meta:
         permissions = (
-            ("change_own", "can change own audio"),
-            ("delete_own", "can delete own audio")
+            ("change_own_audio", "Can change own audio"),
+            ("delete_own_audio", "Can delete own audio")
         )
 
     id = models.UUIDField(
@@ -150,8 +150,8 @@ class Stream(models.Model):
 
     class Meta:
         permissions = (
-            ("change_own", "can change own streams"),
-            ("delete_own", "can delete own streams")
+            ("change_own_stream", "Can change own stream"),
+            ("delete_own_stream", "Can delete own stream")
         )
 
     class AudioFormat(models.TextChoices):
