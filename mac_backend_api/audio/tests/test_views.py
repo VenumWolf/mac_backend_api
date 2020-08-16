@@ -167,10 +167,16 @@ class TestAudioViewSet(TestCase):
 
     def test_update_view_no_permission(self) -> None:
         """Verify the update view returns a 401 when the user is missing permission or is unauthenticated."""
-        response = self.make_update_request(audio=blend_audio(), audio_file=TEST_FILE)
+        response = self.make_update_request(audio=blend_audio())
         self.assertEquals(response.status_code, 401, msg=response.data)
 
-    def test_update_view_other_audio_with_update_own_permission(self):
+    def test_update_view_change_own_permission_with_others_audio(self):
+        """
+        Verify the update view returns a 401 when the user has "audio_change_own" permission but does not own the
+        audio.
+        """
+        response = self.make_update_request(audio=blend_audio(), user=blend_user("Can change own audio"))
+        self.assertEquals(response.status_code, 401, msg=response.data)
 
     def make_update_request(self, audio, audio_file=None, user=None) -> Response:
         """
