@@ -81,7 +81,7 @@ def blend_user(permission_names=None) -> User:
             permission_names = [permission_names]
         for permission in permission_names:
             permission = Permission.objects.get(name=permission)
-            user.permissions.add(permission)
+            user.user_permissions.add(permission)
     return user
 
 
@@ -108,6 +108,7 @@ class TestAudioViewSet(TestCase):
         """Verify the create view returns a 400 with a 'file_not_provided' error message when a file is not provided."""
         view = self.view_set.as_view({"post": "create"})
         request = self.request_factory.post("", data=self.data, format="json")
+        request.user = blend_user("Can add audio")
         response = view(request)
         self.assertEquals(response.status_code, 400)
 
@@ -116,6 +117,7 @@ class TestAudioViewSet(TestCase):
         audio = blend_audio()
         view = self.view_set .as_view({"put": "update"})
         request = self.request_factory.put("", data=self.data, format="json")
+        request.user = blend_user("Can change audio")
         response = view(request, id=audio.id)
         self.assertEquals(response.status_code, 200)
 
@@ -124,9 +126,11 @@ class TestAudioViewSet(TestCase):
         audio = blend_audio()
         view = self.view_set.as_view({"post": "update"})
         request = self.request_factory.post("", data=self.data, format="multipart")
+        request.user = blend_user("Can change audio")
         request.FILES["file"] = TEST_FILE
         response = view(request, id=audio.id)
         self.assertEquals(response.status_code, 400)
+
 
 
 def blend_stream(count=1):
