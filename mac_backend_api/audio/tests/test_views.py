@@ -161,11 +161,6 @@ class TestAudioViewSet(TestCase):
             request.user = user
         return view(request)
 
-    def test_update_view(self) -> None:
-        """Verify the update view returns a 200 when provided valid data"""
-        response = self.make_update_request(audio=blend_audio(), user=blend_user("Can change audio"))
-        self.assertEquals(response.status_code, 200, msg=response.data)
-
     def test_update_view_no_permission(self) -> None:
         """Verify the update view returns a 403 when the user is missing permissions."""
         response = self.make_update_request(audio=blend_audio(), user=blend_user())
@@ -208,11 +203,6 @@ class TestAudioViewSet(TestCase):
             force_authenticate(request, user)
             request.user = user
         return view(request, id=audio.id)
-
-    def test_destroy_view(self) -> None:
-        """Verify the destroy view returns a 204 when a valid id is provided, and user has "delete_audio" permission."""
-        response = self.make_delete_request(blend_audio(), blend_user("Can delete audio"))
-        self.assertEquals(response.status_code, 204, msg=response.data)
 
     def test_destroy_view_no_permission(self) -> None:
         """Verify the destroy view returns a 403 when the user is missing permissions."""
