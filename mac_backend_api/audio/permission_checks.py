@@ -19,7 +19,31 @@ from rest_framework.permissions import BasePermission, IsAuthenticatedOrReadOnly
 
 from mac_backend_api.audio.models import Audio, Stream
 
+IS_OWNER_FUNCTIONS = {
+    Audio: lambda user, audio: user in audio.authors.all(),
+    Stream: lambda user, stream: user in stream.audio.authors.all(),
+    "default": lambda user, obj: user == obj.owner,
+}
+
 
 class IsOwnerOrReadOnly(IsAuthenticatedOrReadOnly):
     def has_object_permission(self, request, view, obj):
-        pass
+        model = type(obj)
+        function = IS_OWNER_FUNCTIONS.get(model, IS_OWNER_FUNCTIONS.get("default"))
+        return self.is_owner(function, request.user, obj)
+
+    def is_owner(self, function, user, obj):
+        """
+        Use the provided function to determine if the user owns the object.
+        :param function: The function which determines if a user is the owner of the object.  The function should return
+                         a boolean value.
+        :param user:     The user making the request.
+        :param obj:      The object to check.
+        :return:         True if the user owns the object.  If the function raises an Exception, False will always be
+                         returned.
+        """
+        try:
+            is_owner = function(user, obj)
+        except Exception:
+            is_owner = False
+        return is_owner
