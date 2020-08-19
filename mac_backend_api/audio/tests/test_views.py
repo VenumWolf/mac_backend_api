@@ -193,7 +193,6 @@ class TestAudioViewSet(TestCase):
         """
         Make a request to the update view and return its response.
         :param audio:      The audio to update.
-        :param audio_file: An audio file to attach with the request if any.  Default is None.
         :param user:       The user making the request if any.  Default is None.
         :return:           The Response from the view.
         """
@@ -276,52 +275,155 @@ class TestStreamViewSet(TestCase):
             "allow_downloads": False,
         }
 
-    def get_detail_view(self) -> None:
-        """Verifies the detail view returns a status code 200 when provided a valid id."""
-        stream = blend_stream()
-        request = self.request_factory.get("")
-        detail_view = self.view_set.as_view({"get": "retrieve"})
-        response = detail_view(request, id=stream.id)
-        self.assertEquals(response.status_code, 200)
+    def test_list_view(self) -> None:
+        """Verify the list view returns a 200 for unauthenticated users."""
+        response = self.make_get_request(view_name="list")
+        self.assertEquals(response.status_code, 200, msg=response.data)
 
-    def test_get_detail_view_invalid_id(self) -> None:
-        """Verifies the detail view returns a 404 when provided an invalid id."""
-        request = self.request_factory.get("")
-        detail_view = self.view_set.as_view({"get": "retrieve"})
-        response = detail_view(request, id="invalid")
-        self.assertEquals(response.status_code, 404)
+    def test_retrieve_view(self) -> None:
+        """Verify the retrieve view returns a 200 for unauthenticated users when provided a valid id."""
+        response = self.make_get_request(view_name="retrieve", stream=blend_stream())
+        self.assertEquals(response.status_code, 200, msg=response.data)
 
-    def test_put_detail_view_new_stream(self) -> None:
-        """Verifies the detail view creates new Audio through a PUT request."""
+    def make_get_request(self, view_name, stream=None, user=None) -> Response:
+        """
+        Make a get request to the specified view and return its response.
+        :param view_name: The view to which to make the request.
+        :param stream:    The stream to request if any.  Default is None.
+        :param user:      The user making the request if any.  Default is None.
+        :return:          The Response from the view.
+        """
+        view = self.view_set.as_view({"get": view_name})
+        request = self.request_factory.get("")
+        if user is not None:
+            force_authenticate(request, user)
+            request.user = user
+        if stream is not None:
+            response = view(request, id=stream.id)
+        else:
+            response = view(request)
+        return response
+
+    def test_create_view(self) -> None:
+        """Verify the create view returns a 201 when provided a file and valid data."""
+        response = self.make_create_request(audio=blend_audio(),
+                                            audio_file=TEST_FILE, user=blend_user("Can add stream"))
+        self.assertEquals(response.status_code, 201, msg=response.data)
+
+    def test_create_view_without_file(self) -> None:
+        """Verify the create view returns a 400 with a 'file_not_provided' error message when a file is not provided."""
+        response = self.make_create_request(audio=blend_audio(), user=blend_user("Can add stream"))
+        self.assertEquals(response.status_code, 400, msg=response.data)
+
+    def test_create_view_no_permission(self) -> None:
+        """Verify the create view returns a 403 when the user is missing permissions."""
+        response = self.make_create_request(audio=blend_audio(), audio_file=TEST_FILE, user=blend_user())
+        self.assertEquals(response.status_code, 403, msg=response.data)
+
+    def test_create_view_no_user(self) -> None:
+        """Verify the create view returns a 401 when user is unauthenticated."""
+        response = self.make_create_request(audio=blend_audio(), audio_file=TEST_FILE)
+        self.assertEquals(response.status_code, 401, msg=response.data)
+
+    def make_create_request(self, audio, audio_file=None, user=None) -> Response:
+        """
+        Make a request to the create view and return its response.
+        :param audio:      The audio instance to which the stream belongs.
+        :param audio_file: The audio file to attach with the request if any.  Default is None
+        :param user:       The user making the request if any.  Default is None.
+        :return:           The Response from the view.
+        """
+        view = self.view_set.as_view({"post": "create"})
         data = self.data
-        data["audio"] = blend_audio().get_absolute_url()
-        data["file"] = self.file.read()
-        request = self.request_factory.put("", data=data, format="multipart")
-        update_view = self.view_set.as_view({"put": "create"})
-        response = update_view(request)
-        print(response.data)
-        self.assertEquals(response.status_code, 201)
+        data["audio"] = audio.get_absolute_url()
+        request = self.request_factory.post("", data=data, format="multipart")
+        if audio_file is not None:
+            request.FILES["file"] = TEST_FILE
+        if user is not None:
+            force_authenticate(request, user)
+            request.user = user
+        return view(request)
 
-    def test_put_detail_view_existing_stream(self) -> None:
-        """Verifies the detail view updates existing Audio with a PUT request."""
+    def test_update_view_no_permission(self) -> None:
+        """Verify the update view returns a 403 when the user is missing permissions."""
+        response = self.make_update_request(stream=blend_stream(), user=blend_user())
+        self.assertEquals(response.status_code, 403, msg=response.data)
+
+    def test_update_view_no_user(self) -> None:
+        """Verify the update view returns a 401 when the user is unauthenticated."""
+        response = self.make_update_request(stream=blend_stream())
+        self.assertEquals(response.status_code, 401, msg=response.data)
+
+    def test_update_view_change_others_stream(self) -> None:
+        """
+        Verify the update view returns a 403 when the user has "change_stream" permission but does not own the
+        stream.
+        """
+        response = self.make_update_request(stream=blend_stream(), user=blend_user("Can change stream"))
+        self.assertEquals(response.status_code, 403, msg=response.data)
+
+    def test_update_view_change_own_stream(self) -> None:
+        """
+        Verify the update view returns a 200 when the user has "change_stream" permission and owns the stream.
+        """
+        user = blend_user("Can change stream")
         stream = blend_stream()
+        stream.audio.authors.add(user)
+        response = self.make_update_request(stream=stream, user=user)
+        self.assertEquals(response.status_code, 200, msg=response.data)
+
+    def make_update_request(self, stream, user=None) -> Response:
+        """
+        Make a request to the update view and return its response.
+        :param stream:      The stream to update.
+        :param user:        The user making the request if any.  Default is None.
+        :return:            The Response from the view.
+        """
+        view = self.view_set.as_view({"put": "update"})
         request = self.request_factory.put("", data=self.data, format="json")
-        update_view = self.view_set.as_view({"put": "update"})
-        response = update_view(request, id=stream.id)
-        self.assertEquals(response.status_code, 200)
+        if user is not None:
+            force_authenticate(request, user)
+            request.user = user
+        return view(request, id=stream.id)
 
-    def test_patch_detail_view(self) -> None:
-        """Verifies the detail view updates existing Audio with a PATCH request."""
-        stream = blend_stream()
-        request = self.request_factory.patch("", data=self.data, format="json")
-        update_view = self.view_set.as_view({"patch": "partial_update"})
-        response = update_view(request, id=stream.id)
-        self.assertEquals(response.status_code, 200)
+    def test_destroy_view_no_permission(self) -> None:
+        """Verify the destroy view returns a 403 when the user is missing permissions."""
+        response = self.make_delete_request(stream=blend_stream(), user=blend_user())
+        self.assertEquals(response.status_code, 403, msg=response.data)
 
-    def test_delete_detail_view(self) -> None:
-        """Verifies the detail view delete's existing audio with a DELETE request."""
+    def test_destroy_view_no_user(self) -> None:
+        """Verify the destroy view returns a 401 when the user is unauthenticated."""
+        response = self.make_delete_request(stream=blend_stream())
+        self.assertEquals(response.status_code, 401, msg=response.data)
+
+    def test_destroy_view_delete_others_stream(self) -> None:
+        """
+        Verify the destroy view returns a 403 when the user has "stream_destroy" permission but does not own the
+        stream.
+        """
+        response = self.make_delete_request(stream=blend_stream(), user=blend_user("Can delete stream"))
+        self.assertEquals(response.status_code, 403, msg=response.data)
+
+    def test_destroy_view_delete_own_stream(self) -> None:
+        """
+        Verify the destroy view returns a 204 when the user has "destroy_stream" permission and owns the stream.
+        """
+        user = blend_user("Can delete stream")
         stream = blend_stream()
+        stream.audio.authors.add(user)
+        response = self.make_delete_request(stream=stream, user=user)
+        self.assertEquals(response.status_code, 204, msg=response.data)
+
+    def make_delete_request(self, stream, user=None) -> Response:
+        """
+        Make a delete request to the destroy view and return its response.
+        :param stream: The stream to delete.
+        :param user:   The user making the request if any.  Default is None.
+        :return:       The Response from the view.
+        """
+        view = self.view_set.as_view({"delete": "destroy"})
         request = self.request_factory.delete("")
-        update_view = self.view_set.as_view({"delete": "destroy"})
-        response = update_view(request, id=stream.id)
-        self.assertEquals(response.status_code, 204)
+        if user is not None:
+            force_authenticate(request, user)
+            request.user = user
+        return view(request, id=stream.id)
