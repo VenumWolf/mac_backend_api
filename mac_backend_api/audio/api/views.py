@@ -29,7 +29,7 @@ class AudioViewSet(ModelViewSet):
     lookup_field = "id"
     queryset = Audio.objects.all()
     parser_classes = (MultiPartParser, FormParser, JSONParser)
-    permission_classes = (IsOwnerOrReadOnly, DjangoModelPermissionsOrAnonReadOnly)
+    permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly, DjangoModelPermissionsOrAnonReadOnly)
 
     def filter_queryset(self, queryset):
         if self.action == "list":
@@ -41,3 +41,4 @@ class StreamViewSet(ModelViewSet):
     serializer_class = StreamSerializer
     lookup_field = "id"
     queryset = Stream.objects.all()
+    permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly, DjangoModelPermissionsOrAnonReadOnly)
