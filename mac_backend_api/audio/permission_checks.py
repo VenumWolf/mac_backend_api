@@ -15,7 +15,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
-from rest_framework.permissions import BasePermission, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 from mac_backend_api.audio.models import Audio, Stream
 
@@ -26,11 +26,15 @@ IS_OWNER_FUNCTIONS = {
 }
 
 
-class IsOwnerOrReadOnly(IsAuthenticatedOrReadOnly):
+class IsOwnerOrReadOnly(BasePermission):
     def has_object_permission(self, request, view, obj):
-        model = type(obj)
-        function = IS_OWNER_FUNCTIONS.get(model, IS_OWNER_FUNCTIONS.get("default"))
-        return self.is_owner(function, request.user, obj)
+        if request.user.is_authenticated and request.method not in SAFE_METHODS:
+            model = type(obj)
+            function = IS_OWNER_FUNCTIONS.get(model, IS_OWNER_FUNCTIONS.get("default"))
+            has_permission = self.is_owner(function, request.user, obj)
+        else:
+            has_permission = True
+        return has_permission
 
     def is_owner(self, function, user, obj):
         """
