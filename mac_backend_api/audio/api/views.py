@@ -16,10 +16,12 @@
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
 from rest_framework.parsers import MultiPartParser, JSONParser, FormParser
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, DjangoModelPermissionsOrAnonReadOnly
 from rest_framework.viewsets import ModelViewSet
 
 from mac_backend_api.audio.api.serializers import AudioSerializer, StreamSerializer
 from mac_backend_api.audio.models import Audio, Stream
+from mac_backend_api.audio.permission_checks import IsOwnerOrReadOnly
 
 
 class AudioViewSet(ModelViewSet):
@@ -27,6 +29,7 @@ class AudioViewSet(ModelViewSet):
     lookup_field = "id"
     queryset = Audio.objects.all()
     parser_classes = (MultiPartParser, FormParser, JSONParser)
+    permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly, DjangoModelPermissionsOrAnonReadOnly)
 
     def filter_queryset(self, queryset):
         if self.action == "list":
@@ -38,3 +41,4 @@ class StreamViewSet(ModelViewSet):
     serializer_class = StreamSerializer
     lookup_field = "id"
     queryset = Stream.objects.all()
+    permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly, DjangoModelPermissionsOrAnonReadOnly)

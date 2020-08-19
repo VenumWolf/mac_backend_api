@@ -20,7 +20,32 @@ from rest_framework import serializers
 from mac_backend_api.audio.models import Audio, Stream
 
 
-class StreamSerializer(serializers.ModelSerializer):
+class NoFileUpdatesSerializer(serializers.ModelSerializer):
+    def validate(self, data):
+        """
+        Insert a file check then call the parent validate() method.
+
+        Using this method because validate_file() is only called if the file is not None.
+        """
+        file = data.get("file", None)
+        if self.is_creating_instance() and file is None:
+            raise serializers.ValidationError("A file is required when creating new Audio instances")
+        if not self.is_creating_instance() and file is not None:
+            raise serializers.ValidationError("A file should only be provided when creating new Audio instances")
+        return super(NoFileUpdatesSerializer, self).validate(data)
+
+    def is_creating_instance(self) -> bool:
+        """
+        Check if the instance is being created.
+
+        This is determined by the value of self.instance.  If the instance will be set to the object it is updating, or
+        None if it is not updating anything.
+        :return: True if the instance is being created.
+        """
+        return self.instance is None
+
+
+class StreamSerializer(NoFileUpdatesSerializer):
     audio = serializers.HyperlinkedRelatedField(
         lookup_field="id",
         required=False,
@@ -74,7 +99,7 @@ DEFAULT_STREAM_PRESETS = (
 )
 
 
-class AudioSerializer(serializers.ModelSerializer):
+class AudioSerializer(NoFileUpdatesSerializer):
     streams = NestedStreamSerializer(
         many=True,
         read_only=True,
@@ -143,19 +168,3 @@ class AudioSerializer(serializers.ModelSerializer):
                 file=audio_file
             )
             stream.save()
-
-    def validate(self, data):
-        """
-        Insert a file check then call the parent validate() method.
-
-        Using this method because validate_file() is only called if the file is not None.
-        """
-        file = data.get("file", None)
-        if self.is_creating_instance() and file is None:
-            raise serializers.ValidationError("A file is required when creating new Audio instances")
-        if not self.is_creating_instance() and file is not None:
-            raise serializers.ValidationError("A file should only be provided when creating new Audio instances")
-        return super(AudioSerializer, self).validate(data)
-
-    def is_creating_instance(self) -> bool:
-        return self.instance is None

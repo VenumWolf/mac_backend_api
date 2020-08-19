@@ -34,6 +34,12 @@ class Audio(models.Model):
     Audio streams can be accessed as a queryset through the `stream_set` parameter.
     """
 
+    class Meta:
+        permissions = (
+            ("change_own_audio", "Can change own audio"),
+            ("delete_own_audio", "Can delete own audio")
+        )
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid4,
@@ -141,6 +147,12 @@ class Stream(models.Model):
     information it provides is correct.  This implementation will process the audio data to match the stored
     information.
     """
+
+    class Meta:
+        permissions = (
+            ("change_own_stream", "Can change own stream"),
+            ("delete_own_stream", "Can delete own stream")
+        )
 
     class AudioFormat(models.TextChoices):
         MP3 = "mp3"
