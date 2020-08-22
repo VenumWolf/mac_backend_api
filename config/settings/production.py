@@ -15,18 +15,32 @@
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
-from os import path
-
 from decouple import config
 
 from .base import *
 
-SECRET_KEY = config("SECRET_KEY")
+SECRET_KEY = config("SECRET_KEY", default="test")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
 ALLOWED_HOSTS = []
+
+# DATABASE
+
+USE_POSTGRESQL = config("USE_POSTGRESQL", default=False, cast=bool)
+if USE_POSTGRESQL:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "NAME": config("DATABASE_NAME", default="mac_backend_database"),
+            "USER": config("DATABASE_USER", default="admin"),
+            "PASSWORD": config("DATABASE_PASSWORD", default="password"),
+            "HOST": config("DATABASE_HOST", default="localhost"),
+            "PORT": config("DATABASE_PORT", default="")
+        }
+    }
+
 
 # EMAIL
 
