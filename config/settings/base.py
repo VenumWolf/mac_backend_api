@@ -15,13 +15,22 @@
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
+from os import path
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 
 APPS_DIR = ROOT_DIR / "mac_backend_api"
 
-SECRET_KEY = "ugu!ng_waw7zmm0rbkxz&2m3-*zc+%@qy#ir_1@-ww-z@#10)6"
+# Database
+# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': path.join(ROOT_DIR, 'db.sqlite3'),
+    }
+}
 
 # Application definition
 
