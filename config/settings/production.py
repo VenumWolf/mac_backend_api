@@ -15,3 +15,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
+from decouple import config
+
+from .base import *
+
+SECRET_KEY = config("SECRET_KEY")
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False
