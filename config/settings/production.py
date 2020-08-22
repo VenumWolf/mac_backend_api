@@ -30,3 +30,7 @@ DEBUG = False
 
 EMAIL_HOST = config("EMAIL_HOST", default="localhost")
 EMAIL_PORT = config("EMAIL_PORT", default=25, cast=int)
+
+# MEDIA
+MEDIA_ROOT = config("MEDIA_ROOT", default=path.join(ROOT_DIR, "media_files"))
+MEDIA_URL = config("MEDIA_URL", default="/media/")
