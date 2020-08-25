@@ -15,8 +15,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
-from uuid import uuid4
-
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
@@ -24,6 +22,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from mac_backend_api.audio.exceptions import UserAlreadyLikesException
+from mac_backend_api.utils.random_id.random_id import random_id
 
 User = get_user_model()
 
@@ -40,9 +39,10 @@ class Audio(models.Model):
             ("delete_own_audio", "Can delete own audio")
         )
 
-    id = models.UUIDField(
+    id = models.CharField(
         primary_key=True,
-        default=uuid4,
+        max_length=14,
+        default=random_id,
         editable=False,
         help_text="Unique id of the audio"
     )
@@ -173,9 +173,10 @@ class Stream(models.Model):
         AVERAGE = 48000
         HIGH = 96000
 
-    id = models.UUIDField(
+    id = models.CharField(
         primary_key=True,
-        default=uuid4,
+        max_length=14,
+        default=random_id,
         editable=False,
         help_text="The unique ID of the stream"
     )
@@ -227,13 +228,20 @@ class Stream(models.Model):
         return extension.lower() in [extension[0] for extension in Stream.AudioFormat.choices]
 
 
-
 class Like(models.Model):
     """
     Represents a like (or up-vote.)
 
     Unlike views, likes must be from a registered user, and each user is allowed to create 1 like per audio.
     """
+    id = models.CharField(
+        primary_key=True,
+        max_length=14,
+        default=random_id,
+        editable=False,
+        help_text="The unique ID of the like"
+    )
+
     user = models.ForeignKey(
         to=User,
         on_delete=models.CASCADE,

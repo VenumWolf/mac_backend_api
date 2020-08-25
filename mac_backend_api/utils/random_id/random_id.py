@@ -18,10 +18,9 @@
 import string
 from random import SystemRandom
 
-URLSAFE_SPECIALS = "-._~"
 
 DEFAULT_ID_LENGTH = 14
-DEFAULT_CHARACTER_SET = string.ascii_letters + string.digits + URLSAFE_SPECIALS
+DEFAULT_CHARACTER_SET = string.ascii_letters + string.digits
 
 
 def random_id(length=DEFAULT_ID_LENGTH, character_set=DEFAULT_CHARACTER_SET):
