@@ -35,6 +35,9 @@ class TestAudioModel(TestCase):
         self.__blend_audio_and_author()
         self.like_user = mixer.blend(User)
 
+    def test_id_length(self):
+        self.assertEquals(14, len(self.audio.id))
+
     def test_get_url(self) -> None:
         """Ensures the audio url is what is expected"""
         assert self.audio.get_absolute_url() == f"/api/audio/{self.audio.id}/"
@@ -103,6 +106,9 @@ class TestAudioStreamModel(TestCase):
     def tearDown(self) -> None:
         os.remove("test_audio.wav")
 
+    def test_id_length(self):
+        self.assertEquals(14, len(self.audio_stream.id))
+
     def test_get_audio_stream_upload_path(self):
         assert (get_audio_stream_upload_path(self.audio_stream, "fake-file-name")
                 == f"audio/{self.audio_stream.audio.id}/{self.audio_stream.id}.{self.audio_stream.format}")
@@ -137,6 +143,9 @@ class TestLikes(TestCase):
         self.like_user = mixer.blend(User)
         self.like_audio = mixer.blend(Audio)
         self.__blend_like()
+
+    def test_id_length(self):
+        self.assertEquals(14, len(self.like.id))
 
     def test_create_new_like(self) -> None:
         """Ensures likes can be created"""

@@ -28,5 +28,8 @@ class TestUserModel(TestCase):
     def setUp(self) -> None:
         self.user = mixer.blend(User)
 
+    def test_id_length(self):
+        self.assertEquals(14, len(self.user.id))
+
     def test_absolute_url(self):
         assert self.user.get_absolute_url() == f"/api/users/{self.user.username}/"
