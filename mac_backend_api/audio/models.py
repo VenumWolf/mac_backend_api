@@ -15,8 +15,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
-from uuid import uuid4
-
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
