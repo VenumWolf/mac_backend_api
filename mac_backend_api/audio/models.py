@@ -234,6 +234,13 @@ class Like(models.Model):
 
     Unlike views, likes must be from a registered user, and each user is allowed to create 1 like per audio.
     """
+    id = models.CharField(
+        primary_key=True,
+        default=random_id,
+        editable=False,
+        help_text="The unique ID of the like"
+    )
+
     user = models.ForeignKey(
         to=User,
         on_delete=models.CASCADE,
