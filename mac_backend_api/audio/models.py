@@ -43,6 +43,7 @@ class Audio(models.Model):
 
     id = models.CharField(
         primary_key=True,
+        max_length=14,
         default=random_id,
         editable=False,
         help_text="Unique id of the audio"
@@ -176,6 +177,7 @@ class Stream(models.Model):
 
     id = models.CharField(
         primary_key=True,
+        max_length=14,
         default=random_id,
         editable=False,
         help_text="The unique ID of the stream"
@@ -236,6 +238,7 @@ class Like(models.Model):
     """
     id = models.CharField(
         primary_key=True,
+        max_length=14,
         default=random_id,
         editable=False,
         help_text="The unique ID of the like"
