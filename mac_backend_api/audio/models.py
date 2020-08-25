@@ -24,6 +24,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from mac_backend_api.audio.exceptions import UserAlreadyLikesException
+from mac_backend_api.utils.random_id.random_id import random_id
 
 User = get_user_model()
 
@@ -40,9 +41,9 @@ class Audio(models.Model):
             ("delete_own_audio", "Can delete own audio")
         )
 
-    id = models.UUIDField(
+    id = models.CharField(
         primary_key=True,
-        default=uuid4,
+        default=random_id,
         editable=False,
         help_text="Unique id of the audio"
     )
@@ -173,9 +174,9 @@ class Stream(models.Model):
         AVERAGE = 48000
         HIGH = 96000
 
-    id = models.UUIDField(
+    id = models.CharField(
         primary_key=True,
-        default=uuid4,
+        default=random_id,
         editable=False,
         help_text="The unique ID of the stream"
     )
@@ -225,7 +226,6 @@ class Stream(models.Model):
         :return:          True if the file extension is that of a supported audio format.
         """
         return extension.lower() in [extension[0] for extension in Stream.AudioFormat.choices]
-
 
 
 class Like(models.Model):
