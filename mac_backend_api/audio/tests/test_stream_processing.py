@@ -15,7 +15,17 @@
 #  You should have received a copy of the GNU General Public License
 #  along with mac_backend_api.  If not, see <https://www.gnu.org/licenses/>.
 
+from tempfile import SpooledTemporaryFile
+
 from django.test import TestCase
+from pydub import AudioSegment
+
+
+def get_audio_file(format='mp3', codec=None, bitrate=None, parameters=None, tags=None, id3v2_version='4'):
+    audio_data = SpooledTemporaryFile()
+    audio_segment = AudioSegment.silent(1000)
+    audio_segment.export(audio_data, format, codec, bitrate, parameters, tags, id3v2_version)
+    return audio_data
 
 
 class TestStreamProcessing(TestCase):
