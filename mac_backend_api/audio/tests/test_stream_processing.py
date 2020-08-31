@@ -18,6 +18,7 @@
 from tempfile import SpooledTemporaryFile
 
 from django.test import TestCase
+from filetype import guess
 from pydub import AudioSegment
 
 
@@ -28,7 +29,18 @@ def get_audio_file(format='mp3', codec=None, bitrate=None, parameters=None, tags
     return audio_data
 
 
+TARGET_FORMATS = ["mp3", "ogg", "wav"]
+
+
 class TestStreamProcessing(TestCase):
-    pass
+    def test_format_conversion(self):
+        """Verifies the file is converted properly for each of the TARGET_FORMATS."""
+        for format in TARGET_FORMATS:
+            self.assert_converted_to_format(get_audio_file(format="raw"), format)
 
-
+    def assert_converted_to_format(self, audio_file, target_format):
+        """Runs the file conversion, then asserts that the converted file matches the target format."""
+        converted_audio = convert_audio(file=audio_file, format=target_format)
+        file_type = guess(converted_audio.read())
+        self.assertEquals(file_type.extension, target_format,
+                          msg=f"The audio was not converted to the expected format.")
