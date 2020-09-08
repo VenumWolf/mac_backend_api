@@ -46,3 +46,11 @@ class TestStreamProcessing(TestCase):
         file_type = guess(converted_audio.read())
         self.assertEquals(file_type.extension, target_format,
                           msg=f"The audio was not converted to the expected format.")
+
+
+class TestFormatIdentification(TestCase):
+    def test_identify_format(self):
+        """Verifies the format identification function can correctly identify required audio formats."""
+        audio_files = [(format, get_audio_file(format))for format in TARGET_FORMATS]
+        for format, file in audio_files:
+            self.assertEquals(identify_audio_format(file), format, msg="The file type was not correctly identified.")
