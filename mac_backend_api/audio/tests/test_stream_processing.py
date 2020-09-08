@@ -50,14 +50,14 @@ class TestStreamProcessing(TestCase):
 
 
 class TestFormatIdentification(TestCase):
-    def test_identify_format(self):
+    def test_valid_formats(self):
         """Verifies the format identification function can correctly identify required audio formats."""
         audio_files = [(format, get_audio_file(format))for format in TARGET_FORMATS]
         for format, file in audio_files:
             self.assertEquals(identify_audio_format(file), format, msg="The file type was not correctly identified.")
 
     def test_invalid_format(self):
-        """Verifies a ValueError is raised if the file does not contain data of a valid audio format."""
+        """Verifies a ValueError is raised if the format identification fun cannot identify a valid audio format."""
         file = SpooledTemporaryFile()
         with raises(ValueError, match="Invalid file format"):
             identify_audio_format(file)
