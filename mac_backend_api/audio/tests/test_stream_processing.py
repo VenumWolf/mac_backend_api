@@ -21,6 +21,8 @@ from django.test import TestCase
 from filetype import guess
 from pydub import AudioSegment
 
+from mac_backend_api.audio.utils.audio_processing import process_audio
+
 
 def get_audio_file(format='mp3', codec=None, bitrate=None, parameters=None, tags=None, id3v2_version='4'):
     audio_data = SpooledTemporaryFile()
@@ -40,7 +42,7 @@ class TestStreamProcessing(TestCase):
 
     def assert_converted_to_format(self, audio_file, target_format):
         """Runs the file conversion, then asserts that the converted file matches the target format."""
-        converted_audio = convert_audio(file=audio_file, format=target_format)
+        converted_audio = process_audio(file=audio_file, format=target_format)
         file_type = guess(converted_audio.read())
         self.assertEquals(file_type.extension, target_format,
                           msg=f"The audio was not converted to the expected format.")
