@@ -44,8 +44,7 @@ class TestStreamProcessing(TestCase):
     def assert_converted_to_format(self, audio_file, target_format):
         """Runs the file conversion, then asserts that the converted file matches the target format."""
         converted_audio = process_audio(file=audio_file, format=target_format)
-        file_type = guess(converted_audio.read())
-        self.assertEquals(file_type.extension, target_format,
+        self.assertEquals(identify_audio_format(converted_audio), target_format,
                           msg=f"The audio was not converted to the expected format.")
 
 
