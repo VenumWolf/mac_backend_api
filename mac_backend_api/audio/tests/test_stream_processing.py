@@ -20,6 +20,7 @@ from tempfile import SpooledTemporaryFile
 from django.test import TestCase
 from filetype import guess
 from pydub import AudioSegment
+from pytest import raises
 
 from mac_backend_api.audio.utils.audio_processing import process_audio
 
@@ -54,3 +55,9 @@ class TestFormatIdentification(TestCase):
         audio_files = [(format, get_audio_file(format))for format in TARGET_FORMATS]
         for format, file in audio_files:
             self.assertEquals(identify_audio_format(file), format, msg="The file type was not correctly identified.")
+
+    def test_invalid_format(self):
+        """Verifies a ValueError is raised if the file does not contain data of a valid audio format."""
+        file = SpooledTemporaryFile()
+        with raises(ValueError, match="Invalid file format"):
+            identify_audio_format(file)
