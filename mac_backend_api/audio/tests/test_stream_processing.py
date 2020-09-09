@@ -39,7 +39,7 @@ class TestStreamProcessing(TestCase):
     def test_format_conversion(self):
         """Verifies the file is converted properly for each of the TARGET_FORMATS."""
         for format in TARGET_FORMATS:
-            self.assert_converted_to_format(get_audio_file(format="raw"), format)
+            self.assert_converted_to_format(get_audio_file(format="mp3"), format)
 
     def assert_converted_to_format(self, audio_file, target_format):
         """Runs the file conversion, then asserts that the converted file matches the target format."""
@@ -51,7 +51,7 @@ class TestStreamProcessing(TestCase):
 class TestFormatIdentification(TestCase):
     def test_valid_formats(self):
         """Verifies the format identification function can correctly identify required audio formats."""
-        audio_files = [(format, get_audio_file(format))for format in TARGET_FORMATS]
+        audio_files = [(format, get_audio_file(format=format)) for format in TARGET_FORMATS]
         for format, file in audio_files:
             self.assertEquals(identify_file_format(file), format, msg="The file type was not correctly identified.")
 
