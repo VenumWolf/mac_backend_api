@@ -17,10 +17,35 @@
 
 from tempfile import SpooledTemporaryFile
 
-from pydub import AudioSegment
+from filetype import filetype
 
 
-def process_audio(file, processors, *kwargs):
+def default_file_identifier(file) -> str:
+    """
+    Identifies the file type using the filetype library.
+    :param file: A file-like object to identify.
+    :return:     A string containing the format name (ex. mp3, ogg, wav, ext.)
+    """
+    file_type = filetype.guess(file)
+    if file_type is None:
+        raise ValueError("Invalid file format")
+    return file_type.extension
+
+
+def identify_file_format(file, identifier=default_file_identifier) -> str:
+    """
+    Get the format, or type of data contained within a file.
+    :param file:       A file-like object to identify.
+    :param identifier: A function which takes a file-like object and returns it's type as a string.  Refer to the
+                       specific identification function's documentation for more informatoin.
+                       (Default: default_file_identifier())
+
+    :return:           A string containing the format name (ex. mp3, ogg, wav, ext.)
+    """
+    return identifier(file)
+
+
+def process_audio(file, processors=None, **kwargs):
     """
     Convert and reformat audio using a set converter.
     :param file:       The input file to process.
