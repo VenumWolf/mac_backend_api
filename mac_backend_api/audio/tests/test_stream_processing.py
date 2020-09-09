@@ -22,7 +22,7 @@ from filetype import guess
 from pydub import AudioSegment
 from pytest import raises
 
-from mac_backend_api.audio.utils.audio_processing import process_audio
+from mac_backend_api.audio.utils.audio_processing import process_audio, identify_file_format
 
 
 def get_audio_file(format='mp3', codec=None, bitrate=None, parameters=None, tags=None, id3v2_version='4'):
@@ -44,7 +44,7 @@ class TestStreamProcessing(TestCase):
     def assert_converted_to_format(self, audio_file, target_format):
         """Runs the file conversion, then asserts that the converted file matches the target format."""
         converted_audio = process_audio(file=audio_file, format=target_format)
-        self.assertEquals(identify_audio_format(converted_audio), target_format,
+        self.assertEquals(identify_file_format(converted_audio), target_format,
                           msg=f"The audio was not converted to the expected format.")
 
 
@@ -53,10 +53,10 @@ class TestFormatIdentification(TestCase):
         """Verifies the format identification function can correctly identify required audio formats."""
         audio_files = [(format, get_audio_file(format))for format in TARGET_FORMATS]
         for format, file in audio_files:
-            self.assertEquals(identify_audio_format(file), format, msg="The file type was not correctly identified.")
+            self.assertEquals(identify_file_format(file), format, msg="The file type was not correctly identified.")
 
     def test_invalid_format(self):
         """Verifies a ValueError is raised if the format identification fun cannot identify a valid audio format."""
         file = SpooledTemporaryFile()
         with raises(ValueError, match="Invalid file format"):
-            identify_audio_format(file)
+            identify_file_format(file)
