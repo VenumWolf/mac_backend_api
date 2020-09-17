@@ -18,6 +18,7 @@
 from tempfile import SpooledTemporaryFile
 
 from filetype import filetype
+from pydub import AudioSegment
 
 
 def default_file_identifier(file) -> str:
@@ -26,7 +27,8 @@ def default_file_identifier(file) -> str:
     :param file: A file-like object to identify.
     :return:     A string containing the format name (ex. mp3, ogg, wav, ext.)
     """
-    file_type = filetype.guess(file)
+    file.seek(0)
+    file_type = filetype.guess(file.read())
     if file_type is None:
         raise ValueError("Invalid file format")
     return file_type.extension
@@ -45,14 +47,25 @@ def identify_file_format(file, identifier=default_file_identifier) -> str:
     return identifier(file)
 
 
-def process_audio(file, processors=None, **kwargs):
+def pydub_audio_processor(file, **kwargs):
+    output_file = SpooledTemporaryFile()
+    output_format = kwargs.get("format")
+    file_format = identify_file_format(file)
+    file.seek(0)
+    audio = AudioSegment.from_file(file, file_format)
+    audio.set_frame_rate(kwargs.get("sample_rate", 48000))
+    audio.export(output_file, format=output_format)
+    return output_file
+
+
+def process_audio(file, processor=pydub_audio_processor, **kwargs):
     """
     Convert and reformat audio using a set converter.
     :param file:       The input file to process.
-    :param processors: A function or list of functions to apply to the audio (reference the processor function's
+    :param processor: A function which will process the audio (reference the processor function's
                        documentation for more information.)
     :param kwargs:     The arguments to pass to the processors (reference the processor function's documentation for more
                        information.)
     :return:           A file-like object containing the processed audio data.
     """
-    return SpooledTemporaryFile()
+    return processor(file, **kwargs)
