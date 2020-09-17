@@ -18,7 +18,6 @@
 from tempfile import SpooledTemporaryFile
 
 from django.test import TestCase
-from filetype import guess
 from pydub import AudioSegment
 from pytest import raises
 
