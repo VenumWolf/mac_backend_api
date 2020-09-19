@@ -24,10 +24,10 @@ from pytest import raises
 from mac_backend_api.audio.utils.audio_processing import process_audio, identify_file_format
 
 
-def get_audio_file(format='mp3', codec=None, bitrate=None, parameters=None, tags=None, id3v2_version='4'):
+def get_audio_file(format='mp3'):
     audio_data = SpooledTemporaryFile()
     audio_segment = AudioSegment.silent(1000)
-    audio_segment.export(audio_data, format, codec, bitrate, parameters, tags, id3v2_version)
+    audio_segment.export(audio_data, format=format)
     return audio_data
 
 
@@ -38,7 +38,7 @@ class TestStreamProcessing(TestCase):
     def test_format_conversion(self):
         """Verifies the file is converted properly for each of the TARGET_FORMATS."""
         for format in TARGET_FORMATS:
-            self.assert_converted_to_format(get_audio_file(format="mp3"), format)
+            self.assert_converted_to_format(get_audio_file(), format)
 
     def assert_converted_to_format(self, audio_file, target_format):
         """Runs the file conversion, then asserts that the converted file matches the target format."""
